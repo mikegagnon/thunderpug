@@ -156,7 +156,7 @@ class Viz {
         this.stage.addChild(this.container);
 
         const g = new createjs.Shape();
-        g.graphics.beginFill("red").drawRect(0, 0, this.game.numCols * BLOCK_SIZE, this.game.numRows * BLOCK_SIZE);
+        g.graphics.beginFill("darkgray").drawRect(0, 0, this.game.numCols * BLOCK_SIZE, this.game.numRows * BLOCK_SIZE);
         this.container.addChild(g);
         g.cache(0, 0, this.game.numCols * BLOCK_SIZE, this.game.numRows * BLOCK_SIZE)
 
