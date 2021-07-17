@@ -1,0 +1,31 @@
+<html>
+<head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">
+    <link rel="shortcut icon" href="#">
+    <!-- https://stackoverflow.com/questions/46987655/how-to-make-canvas-100-fit-to-the-screen/46988000 -->
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: gray;
+        }
+
+        #canvas {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 1px solid red;
+        }
+    </style>
+    <script src="https://code.createjs.com/1.0.0/createjs.min.js"></script>
+
+</head>
+<body onload="initRbWorld();">
+    <canvas id="rb-world-canvas"></canvas>
+</body>
+<script type="text/javascript">
+    var MODE = "play";
+</script>
+<script src="rb-world.js"></script>
+</html>
