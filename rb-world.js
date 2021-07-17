@@ -105,6 +105,8 @@ class Viz {
         this.container.y = 0;
         this.stage.addChild(this.container);
 
+        this.drawGrid();
+
         for (let i = 0; i < this.game.pieces.length; i++) {
             const piece = this.game.pieces[i];
             piece.bitmap = new createjs.Bitmap(this.queueResult[piece.typ]);
@@ -114,6 +116,34 @@ class Viz {
         }
 
         this.stage.update();
+    }
+
+    drawGrid() {
+        const line = new createjs.Shape();
+
+        for (let r = 0; r <= this.game.numRows; r++) {
+            this.drawHorzGridLine(r, line);
+        }
+        for (let c = 0; c <= this.game.numCols; c++) {
+            this.drawVertGridLine(c, line);
+        }
+
+        this.container.addChild(line);
+        line.cache(0, 0, this.game.numCols * BLOCK_SIZE, this.game.numRows * BLOCK_SIZE)
+    }
+
+    drawHorzGridLine(rowIndex, line) {
+        line.graphics.setStrokeStyle(1).beginStroke("#00F");
+        line.graphics.moveTo(0, rowIndex * BLOCK_SIZE);
+        line.graphics.lineTo(this.game.numCols * BLOCK_SIZE, rowIndex * BLOCK_SIZE);
+        line.graphics.endStroke();
+    }
+
+    drawVertGridLine(colIndex, line) {
+        line.graphics.setStrokeStyle(1).beginStroke("#00F");
+        line.graphics.moveTo(colIndex * BLOCK_SIZE, 0);
+        line.graphics.lineTo(colIndex * BLOCK_SIZE, this.game.numRows * BLOCK_SIZE);
+        line.graphics.endStroke();
     }
 
     /*handleTick(event) {
