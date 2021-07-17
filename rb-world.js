@@ -114,7 +114,7 @@ class Camera {
         this.viz.container.x = this.viz.canvas.width / 2 - this.center.x;
         this.viz.container.y = this.viz.canvas.height / 2 - this.center.y;
 
-        console.log("hello", this.center);
+        //console.log("hello", this.center);
     }
 }
 
@@ -235,7 +235,25 @@ class Controller {
 
         this.viz.canvas.onwheel = function(event) {
             THIS.zoom(event);
-        }
+        };
+
+        this.viz.container.on("pressmove", function(evt) {
+            THIS.pressmove(evt);
+        });
+
+        this.viz.container.on("pressup", function(evt) {
+            THIS.pressup(evt);
+        });
+
+
+    }
+
+    pressmove(evt) {
+        console.log("pressmove");
+    }
+
+    pressup(evt) {
+        console.log("pressup");
     }
 
     //https://developer.mozilla.org/en-US/docs/Web/API/Element/wheel_event
