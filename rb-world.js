@@ -1,7 +1,11 @@
 const FPS = 30;
 const START_SCALE = 4;
 
+
+const MAX_ZOOM = 8;
+const MIN_ZOOM = 0.01;
 const BLOCK_SIZE = 16;
+
 const BLOCK_TYPES = [
     "ball",
     "block",
@@ -67,14 +71,62 @@ class Game {
     }
 }
 
+class Camera {
+    constructor(viz, game, scale) {
+        this.viz = viz;
+        this.game = game;
+        this.trackingBall = true;
+
+        this.scale = scale;        
+        this.viz.container.scaleX = this.scale;
+        this.viz.container.scaleY = this.scale;
+
+        // The coordinates for the center of the *container* (not the stage)
+        this.center = {
+            x: 0,
+            y: 0,
+        };
+    }
+
+    centerBall(ball) {
+        const ballX = this.game.ball.bitmap.x;
+        const ballY = this.game.ball.bitmap.y;
+        this.center.x = (ballX + BLOCK_SIZE / 2) * this.scale;
+        this.center.y = (ballY + BLOCK_SIZE / 2) * this.scale;
+    }
+
+    /*update(container) {
+        container.scaleX = this.scale;
+        container.scaleY = this.scale;
+    }*/
+
+    // The coordinates for the center of the *container* (not the stage)
+    pan(center) {
+
+        //this.update(container);
+
+        if (this.trackingBall) {
+            this.centerBall(this.game.ball);
+        } else {
+            this.center = center;
+        }
+
+        this.viz.container.x = this.viz.canvas.width / 2 - this.center.x;
+        this.viz.container.y = this.viz.canvas.height / 2 - this.center.y;
+
+        console.log("hello", this.center);
+    }
+}
+
 class Viz {
     constructor(queue, game, canvasId, scale, mode) {
         this.queue = queue;
         this.game = game;
         this.canvasId = canvasId;
-        //this.camera = new Camera(scale);
         this.mode = mode;
         this.setup();
+        this.camera = new Camera(this, this.game, scale);
+        this.camera.pan();
     }
 
     setup() {
@@ -82,7 +134,7 @@ class Viz {
         createjs.Ticker.addEventListener("tick", handleTick);
         const THIS = this;
         function handleTick(event) {
-            //THIS.handleTick(event);
+            THIS.handleTick(event);
         }
 
         this.queueResult = {};
@@ -146,12 +198,12 @@ class Viz {
         line.graphics.endStroke();
     }
 
-    /*handleTick(event) {
+    handleTick(event) {
         if (this.camera.trackingBall) {
-            this.pan();
+            this.camera.pan();
             this.stage.update();
         }
-    }*/
+    }
 }
 
 class Controller {
@@ -251,6 +303,10 @@ class Controller {
     }
 }
 
+let GAME;
+let VIZ;
+let CONTROLLER;
+
 function initRbWorld() {
     const queue = new createjs.LoadQueue();
     queue.on("complete", handleComplete, this);
@@ -260,13 +316,13 @@ function initRbWorld() {
     ]);
     function handleComplete() {
         if (MODE == "play") {
-            const game = new Game(GAME_NUM_ROWS, GAME_NUM_COLS, PIECES);
-            const viz = new Viz(queue, game, "rb-world-canvas", START_SCALE, MODE);
-            const controller = new Controller(game, viz);
+            GAME = new Game(GAME_NUM_ROWS, GAME_NUM_COLS, PIECES);
+            VIZ = new Viz(queue, GAME, "rb-world-canvas", START_SCALE, MODE);
+            CONTROLLER = new Controller(GAME, VIZ);
         } else {
-            const game = new Game(GAME_NUM_ROWS, GAME_NUM_COLS, PIECES);
-            const viz = new Viz(queue, game, "rb-world-canvas", START_SCALE, MODE);
-            const controller = new Controller(game, viz);
+            GAME = new Game(GAME_NUM_ROWS, GAME_NUM_COLS, PIECES);
+            VIZ = new Viz(queue, GAME, "rb-world-canvas", START_SCALE, MODE);
+            CONTROLLER = new Controller(GAME, VIZ);
         }
     }
 }
