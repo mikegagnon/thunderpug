@@ -131,11 +131,7 @@ class Viz {
 
     setup() {
         createjs.Ticker.framerate = FPS;
-        createjs.Ticker.addEventListener("tick", handleTick);
-        const THIS = this;
-        function handleTick(event) {
-            THIS.handleTick(event);
-        }
+        
 
         this.queueResult = {};
         for (let i = 0; i < BLOCK_TYPES.length; i++) {
@@ -155,7 +151,16 @@ class Viz {
         this.container = new createjs.Container();
         this.container.x = 0;
         this.container.y = 0;
+
+        
         this.stage.addChild(this.container);
+
+        const g = new createjs.Shape();
+        g.graphics.beginFill("red").drawRect(0, 0, this.game.numCols * BLOCK_SIZE, this.game.numRows * BLOCK_SIZE);
+        this.container.addChild(g);
+        g.cache(0, 0, this.game.numCols * BLOCK_SIZE, this.game.numRows * BLOCK_SIZE)
+
+
 
         this.drawGrid();
 
@@ -168,6 +173,12 @@ class Viz {
         }
 
         this.stage.update();
+
+        createjs.Ticker.addEventListener("tick", handleTick);
+        const THIS = this;
+        function handleTick(event) {
+            THIS.handleTick(event);
+        }
     }
 
     drawGrid() {
