@@ -1,4 +1,4 @@
-const FPS = 30;
+const FPS = 60;
 const START_SCALE = 4;
 
 
@@ -76,16 +76,17 @@ class Camera {
         this.viz = viz;
         this.game = game;
         this.trackingBall = true;
-
-        this.scale = scale;        
-        this.viz.container.scaleX = this.scale;
-        this.viz.container.scaleY = this.scale;
+        
 
         // The coordinates for the center of the *container* (not the stage)
         this.center = {
             x: 0,
             y: 0,
         };
+
+        this.zoom(scale);
+        this.centerBall();
+        this.placeCamera();
     }
 
     centerBall(ball) {
@@ -95,13 +96,19 @@ class Camera {
         this.center.y = (ballY + BLOCK_SIZE / 2) * this.scale;
     }
 
+    zoom(scale) {
+        this.scale = scale;
+        this.viz.container.scaleX = this.scale;
+        this.viz.container.scaleY = this.scale;
+    }
+
     /*update(container) {
         container.scaleX = this.scale;
         container.scaleY = this.scale;
     }*/
 
     // The coordinates for the center of the *container* (not the stage)
-    pan(center) {
+    /*pan(center) {
 
         //this.update(container);
 
@@ -115,6 +122,11 @@ class Camera {
         this.viz.container.y = this.viz.canvas.height / 2 - this.center.y;
 
         //console.log("hello", this.center);
+    }*/
+
+    placeCamera() {
+        this.viz.container.x = this.viz.canvas.width / 2 - this.center.x;
+        this.viz.container.y = this.viz.canvas.height / 2 - this.center.y;
     }
 }
 
@@ -126,7 +138,6 @@ class Viz {
         this.mode = mode;
         this.setup();
         this.camera = new Camera(this, this.game, scale);
-        this.camera.pan();
     }
 
     setup() {
@@ -155,12 +166,11 @@ class Viz {
         
         this.stage.addChild(this.container);
 
+        // Draw background color
         const g = new createjs.Shape();
-        g.graphics.beginFill("darkgray").drawRect(0, 0, this.game.numCols * BLOCK_SIZE, this.game.numRows * BLOCK_SIZE);
+        g.graphics.beginFill("#333").drawRect(0, 0, this.game.numCols * BLOCK_SIZE, this.game.numRows * BLOCK_SIZE);
         this.container.addChild(g);
-        g.cache(0, 0, this.game.numCols * BLOCK_SIZE, this.game.numRows * BLOCK_SIZE)
-
-
+        g.cache(0, 0, this.game.numCols * BLOCK_SIZE, this.game.numRows * BLOCK_SIZE);
 
         this.drawGrid();
 
@@ -211,10 +221,15 @@ class Viz {
 
     handleTick(event) {
         if (this.camera.trackingBall) {
-            this.camera.pan();
+            this.camera.centerBall();
+            this.camera.placeCamera();
             this.stage.update();
         }
     }
+
+
+
+    
 }
 
 class Controller {
@@ -222,6 +237,7 @@ class Controller {
         this.game = game;
         this.viz = viz;
         this.enabledMovement = true;
+        this.dragStart = null;
 
         // https://stackoverflow.com/questions/5597060/detecting-arrow-key-presses-in-javascript
         document.onkeydown = checkKey;
@@ -261,6 +277,16 @@ class Controller {
 
     pressmove(evt) {
         console.log("pressmove");
+
+        if (!this.dragStart) {
+            const containerX = evt.stageX;
+            const containerY = evt.stageY;
+            this.dragStart = {
+                x: containerX,
+                y: containerY,
+            };
+            //console.log(this.dragStart);
+        }
     }
 
     pressup(evt) {
@@ -277,8 +303,9 @@ class Controller {
         // Restrict scale
         scale = Math.min(Math.max(MIN_ZOOM, scale), MAX_ZOOM);
 
-        this.viz.camera.scale = scale;
-        this.viz.pan();
+        this.viz.camera.zoom(scale);
+        //this.viz.pan();
+        this.viz.camera.placeCamera();
     }
 
     disableMove() {
