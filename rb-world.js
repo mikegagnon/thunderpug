@@ -1,5 +1,5 @@
 const FPS = 60;
-const START_SCALE = 1;
+const START_SCALE = 4;
 
 
 const MAX_ZOOM = 8;
@@ -333,8 +333,8 @@ class Controller {
             console.log(this.dragStart);
         } else {
             this.containerStart = {
-                x: evt.stageX - this.viz.container.x + this.containerStart.x,
-                y: evt.stageY - this.viz.container.y + this.containerStart.y,
+                x: evt.stageX - this.viz.container.x + this.containerStart.x - this.dragStart.x,
+                y: evt.stageY - this.viz.container.y + this.containerStart.y - this.dragStart.y,
             }
         }
 
