@@ -316,11 +316,6 @@ class Controller {
 
         if (!this.dragStart) {
             this.viz.camera.trackingBall = false;
-            // normalized relative to container
-            //const containerX = evt.stageX - this.viz.container.x;
-            //const containerY = evt.stageY - this.viz.container.y;
-            //const containerX = (evt.stageX - this.viz.container.x) / this.viz.camera.scale;
-            //const containerY = (evt.stageY - this.viz.container.y) / this.viz.camera.scale;
             this.dragStart = {
                 x: evt.stageX - this.viz.container.x,
                 y: evt.stageY - this.viz.container.y,
@@ -369,6 +364,8 @@ class Controller {
         this.viz.camera.zoom(scale);
         //this.viz.pan();
         this.viz.camera.placeCamera();
+        this.viz.stage.update();
+
     }
 
     disableMove() {
