@@ -278,19 +278,42 @@ class Controller {
     pressmove(evt) {
         console.log("pressmove");
 
+        const containerX = evt.stageX - this.viz.container.x;
+        const containerY = evt.stageY - this.viz.container.y;
+
         if (!this.dragStart) {
-            const containerX = evt.stageX;
-            const containerY = evt.stageY;
+            this.viz.camera.trackingBall = false;
+            // normalized relative to container
+            //const containerX = evt.stageX - this.viz.container.x;
+            //const containerY = evt.stageY - this.viz.container.y;
+            //const containerX = (evt.stageX - this.viz.container.x) / this.viz.camera.scale;
+            //const containerY = (evt.stageY - this.viz.container.y) / this.viz.camera.scale;
             this.dragStart = {
                 x: containerX,
                 y: containerY,
             };
-            //console.log(this.dragStart);
+            this.cameraCenterStart = {
+                x: this.viz.camera.center.x,
+                y: this.viz.camera.center.y,
+            };
+            console.log(this.dragStart);
         }
+
+        const newCameraCenter = {
+            x: this.dragStart.x - containerX + this.cameraCenterStart.x,
+            y: this.dragStart.y - containerY + this.cameraCenterStart.y,
+        };
+
+        this.viz.camera.center = newCameraCenter;
+
+        this.viz.camera.placeCamera();
+        this.viz.stage.update();
+
     }
 
     pressup(evt) {
         console.log("pressup");
+        this.dragStart = null;
     }
 
     //https://developer.mozilla.org/en-US/docs/Web/API/Element/wheel_event
