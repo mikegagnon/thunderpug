@@ -1,5 +1,5 @@
 const FPS = 60;
-const START_SCALE = 4;
+const START_SCALE = 1;
 
 
 const MAX_ZOOM = 8;
@@ -125,6 +125,7 @@ class Camera {
     }*/
 
     placeCamera() {
+        console.log("placeCamera")
         this.viz.container.x = this.viz.canvas.width / 2 - this.center.x;
         this.viz.container.y = this.viz.canvas.height / 2 - this.center.y;
     }
@@ -142,7 +143,6 @@ class Viz {
 
     setup() {
         createjs.Ticker.framerate = FPS;
-        
 
         this.queueResult = {};
         for (let i = 0; i < BLOCK_TYPES.length; i++) {
@@ -163,7 +163,6 @@ class Viz {
         this.container.x = 0;
         this.container.y = 0;
 
-        
         this.stage.addChild(this.container);
 
         // Draw background color
@@ -226,10 +225,6 @@ class Viz {
             this.stage.update();
         }
     }
-
-
-
-    
 }
 
 class Controller {
@@ -275,6 +270,9 @@ class Controller {
 
     }
 
+
+
+    /*
     pressmove(evt) {
         console.log("pressmove");
 
@@ -305,6 +303,48 @@ class Controller {
         };
 
         this.viz.camera.center = newCameraCenter;
+        console.log(this.viz.camera.center);
+
+        this.viz.camera.placeCamera();
+        this.viz.stage.update();
+
+    }
+    */
+
+    pressmove(evt) {
+        console.log("pressmove");
+
+        if (!this.dragStart) {
+            this.viz.camera.trackingBall = false;
+            // normalized relative to container
+            //const containerX = evt.stageX - this.viz.container.x;
+            //const containerY = evt.stageY - this.viz.container.y;
+            //const containerX = (evt.stageX - this.viz.container.x) / this.viz.camera.scale;
+            //const containerY = (evt.stageY - this.viz.container.y) / this.viz.camera.scale;
+            this.dragStart = {
+                x: evt.stageX - this.viz.container.x,
+                y: evt.stageY - this.viz.container.y,
+            };
+            this.containerStart = this.dragStart;
+            this.cameraCenterStart = {
+                x: this.viz.camera.center.x,
+                y: this.viz.camera.center.y,
+            };
+            console.log(this.dragStart);
+        } else {
+            this.containerStart = {
+                x: evt.stageX - this.viz.container.x + this.containerStart.x,
+                y: evt.stageY - this.viz.container.y + this.containerStart.y,
+            }
+        }
+
+        const newCameraCenter = {
+            x: this.dragStart.x - this.containerStart.x + this.cameraCenterStart.x,
+            y: this.dragStart.y - this.containerStart.y + this.cameraCenterStart.y,
+        };
+
+        this.viz.camera.center = newCameraCenter;
+        console.log(this.viz.camera.center);
 
         this.viz.camera.placeCamera();
         this.viz.stage.update();
