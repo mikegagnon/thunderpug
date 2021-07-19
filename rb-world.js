@@ -269,11 +269,24 @@ class Controller {
 
         //this.rangeInput = 
         document.getElementById("zoom-range").addEventListener('input', function(x) {
-            console.log(x);
+            THIS.zoomRangeInput(x)
         });
 
 
 
+    }
+
+    zoomRangeInput(x) {
+
+        console.log(x.target.value);
+        // Restrict scale
+        let scale = x.target.value;
+        scale = Math.min(Math.max(MIN_ZOOM, scale), MAX_ZOOM);
+
+        this.viz.camera.zoom(scale);
+        //this.viz.pan();
+        this.viz.camera.placeCamera();
+        this.viz.stage.update();
     }
 
     stageMouseDown(evt) {
