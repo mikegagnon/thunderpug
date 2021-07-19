@@ -1,5 +1,5 @@
 const FPS = 60;
-const START_SCALE = 4;
+const START_SCALE = 1.5;
 
 
 const MAX_ZOOM = 8;
@@ -152,7 +152,7 @@ class Viz {
 
         this.canvas = document.getElementsByTagName("canvas")[0];
         this.canvas.width = document.body.clientWidth;
-        this.canvas.height = document.body.clientHeight;
+        this.canvas.height = document.body.clientHeight - 40; // -30 for slider space
 
         this.stage = new createjs.StageGL(this.canvasId);
         createjs.Touch.enable(this.stage);
@@ -267,49 +267,18 @@ class Controller {
             THIS.pressup(evt);
         });
 
+        //this.rangeInput = 
+        document.getElementById("zoom-range").addEventListener('input', function(x) {
+            console.log(x);
+        });
+
+
 
     }
 
-
-
-    /*
-    pressmove(evt) {
-        console.log("pressmove");
-
-        const containerX = evt.stageX - this.viz.container.x;
-        const containerY = evt.stageY - this.viz.container.y;
-
-        if (!this.dragStart) {
-            this.viz.camera.trackingBall = false;
-            // normalized relative to container
-            //const containerX = evt.stageX - this.viz.container.x;
-            //const containerY = evt.stageY - this.viz.container.y;
-            //const containerX = (evt.stageX - this.viz.container.x) / this.viz.camera.scale;
-            //const containerY = (evt.stageY - this.viz.container.y) / this.viz.camera.scale;
-            this.dragStart = {
-                x: containerX,
-                y: containerY,
-            };
-            this.cameraCenterStart = {
-                x: this.viz.camera.center.x,
-                y: this.viz.camera.center.y,
-            };
-            console.log(this.dragStart);
-        }
-
-        const newCameraCenter = {
-            x: this.dragStart.x - containerX + this.cameraCenterStart.x,
-            y: this.dragStart.y - containerY + this.cameraCenterStart.y,
-        };
-
-        this.viz.camera.center = newCameraCenter;
-        console.log(this.viz.camera.center);
-
-        this.viz.camera.placeCamera();
-        this.viz.stage.update();
-
+    stageMouseDown(evt) {
+        console.log("evt.pointerID", evt.pointerID);
     }
-    */
 
     pressmove(evt) {
         console.log("pressmove");
@@ -422,6 +391,8 @@ class Controller {
 let GAME;
 let VIZ;
 let CONTROLLER;
+
+
 
 function initRbWorld() {
     const queue = new createjs.LoadQueue();

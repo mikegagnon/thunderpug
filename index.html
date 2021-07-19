@@ -1,5 +1,6 @@
 <html>
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
     <meta content="utf-8" http-equiv="encoding">
     <link rel="shortcut icon" href="#">
@@ -8,21 +9,32 @@
         body {
             margin: 0;
             padding: 0;
-            background-color: gray;
+            background-color: black;
         }
 
-        #canvas {
-            position: absolute;
+        #rb-world-canvas {
+            /*position: absolute;
+            /*left: 30px;
             width: 100%;
-            height: 100%;
-            border: 1px solid red;
+            height: 100%;*/
+        }
+
+        #zoom-range {
+            width: 100%;
+            height: 20px;
+            margin-top: 10px;
+            //*height: 20px;*/
         }
     </style>
     <script src="createjs.min.js"></script>
 
 </head>
 <body onload="initRbWorld();">
-    <canvas id="rb-world-canvas"></canvas>
+    
+    <div><canvas id="rb-world-canvas"></canvas></div>
+    <div>
+      <input type="range" min="0.01" max="8" value="1.5" id="zoom-range">
+    </div>
 </body>
 <script type="text/javascript">
     var MODE = "play";
