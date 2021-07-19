@@ -11,11 +11,13 @@ const BLOCK_TYPES = [
     "block",
 ];
 
-//const GAME_NUM_ROWS = 15 * 7;
-//const GAME_NUM_COLS = 15 * 7;
+const GAME_NUM_ROWS = 16 * 7;
+const GAME_NUM_COLS = 16 * 7;
+const NUM_BLOCKS = 5000;
+//const NUM_BLOCKS = 5;
 
-const GAME_NUM_ROWS = 5;
-const GAME_NUM_COLS = 5;
+//const GAME_NUM_ROWS = 5;
+//const GAME_NUM_COLS = 5;
 
 const PIECES = [
     {
@@ -32,8 +34,6 @@ function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min) + min); //The maximum is exclusive and the minimum is inclusive
 }
 
-//const NUM_BLOCKS = 5000;
-const NUM_BLOCKS = 5;
 for (let i = 0; i < NUM_BLOCKS; i++) {
     const piece = {
         typ: "block",
@@ -167,7 +167,7 @@ class Viz {
 
         // Draw background color
         const g = new createjs.Shape();
-        g.graphics.beginFill("#333").drawRect(0, 0, this.game.numCols * BLOCK_SIZE, this.game.numRows * BLOCK_SIZE);
+        g.graphics.beginFill("#000").drawRect(0, 0, this.game.numCols * BLOCK_SIZE, this.game.numRows * BLOCK_SIZE);
         this.container.addChild(g);
         g.cache(0, 0, this.game.numCols * BLOCK_SIZE, this.game.numRows * BLOCK_SIZE);
 
