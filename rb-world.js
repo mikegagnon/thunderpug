@@ -319,10 +319,12 @@ class Controller {
             THIS.pressup(evt);
         });
 
+        /*
         this.zoomSlider = document.getElementById("zoom-range");
         this.zoomSlider.style.width = 40;
         this.zoomSlider.style.height = this.viz.canvas.height - 40;
         this.zoomSlider.value = START_SCALE;
+
         //console.log(this.zoomSlider.style.height);
 
 
@@ -330,6 +332,7 @@ class Controller {
         this.zoomSlider.addEventListener("input", function(x) {
             THIS.zoomRangeInput(x)
         });
+        */
 
 
 
