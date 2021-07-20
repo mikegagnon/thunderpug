@@ -84,9 +84,9 @@ class Camera {
             y: 0,
         };
 
-        this.zoom(scale);
         this.centerBall();
         this.placeCamera();
+        this.zoom(scale);
     }
 
     centerBall(ball) {
@@ -100,6 +100,7 @@ class Camera {
         this.scale = scale;
         this.viz.container.scaleX = this.scale;
         this.viz.container.scaleY = this.scale;
+        //console.log(this.scale);
     }
 
     /*update(container) {
@@ -125,7 +126,7 @@ class Camera {
     }*/
 
     placeCamera() {
-        console.log("placeCamera")
+        //console.log("placeCamera")
         this.viz.container.x = this.viz.canvas.width / 2 - this.center.x;
         this.viz.container.y = this.viz.canvas.height / 2 - this.center.y;
     }
@@ -283,10 +284,10 @@ class Controller {
         let scale = x.target.value;
         scale = Math.min(Math.max(MIN_ZOOM, scale), MAX_ZOOM);
 
-        this.viz.camera.zoom(scale);
         //this.viz.pan();
         this.viz.camera.placeCamera();
-        this.viz.stage.update();
+        this.viz.camera.zoom(scale);
+        //this.viz.stage.update();
     }
 
     stageMouseDown(evt) {
@@ -338,15 +339,15 @@ class Controller {
         event.preventDefault();
 
         let scale = this.viz.camera.scale;
-        scale += event.deltaY * -0.001;
+        scale += event.deltaY * 0.001;
 
         // Restrict scale
         scale = Math.min(Math.max(MIN_ZOOM, scale), MAX_ZOOM);
 
-        this.viz.camera.zoom(scale);
         //this.viz.pan();
         this.viz.camera.placeCamera();
-        this.viz.stage.update();
+        this.viz.camera.zoom(scale);
+        //this.viz.stage.update();
 
     }
 
