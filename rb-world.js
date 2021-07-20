@@ -1,5 +1,5 @@
 const FPS = 60;
-const START_SCALE = 1;
+const START_SCALE = 2;
 const ZOOM_SLIDER_WIDTH = 40;
 // num millis for the ball to move one square
 const BALL_MOVE_INTERVAL = 50;
