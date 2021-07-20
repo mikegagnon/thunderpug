@@ -284,7 +284,7 @@ class Controller {
         this.viz = viz;
         this.enabledMovement = true;
         this.dragStart = null;
-        this.setupArrowButtons();
+        //this.setupArrowButtons();
 
         // https://stackoverflow.com/questions/5597060/detecting-arrow-key-presses-in-javascript
         document.onkeydown = checkKey;
@@ -335,7 +335,7 @@ class Controller {
 
     }
 
-    setupArrowButtons() {
+    /*setupArrowButtons() {
         const OFFSET = 30;
         const THIS = this;
         this.leftArrowButton = document.getElementById("left-arrow");
@@ -375,7 +375,7 @@ class Controller {
         }
 
 
-    }
+    }*/
 
     zoomRangeInput(x) {
 
