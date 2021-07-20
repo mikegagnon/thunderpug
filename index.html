@@ -13,9 +13,10 @@
         }
 
         #rb-world-canvas {
-            /*float: left;
+            left: 25px;
             position: absolute;
-            /*left: 30px;
+            /*float: left;
+            left: 30px;
             width: 100%;
             height: 100%;*/
         }
@@ -28,6 +29,20 @@
             margin-top: 10px;
             /*height: 20px;*/
         }
+
+        .arrow-button-vert {
+            font-size: 20px;
+            background-color: #4CAF50; /* Green */
+            border: none;
+            color: white;
+            height: 10px;
+            width: 5px;
+            padding: 5px 5px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            position: absolute;
+        }
     </style>
     <script src="createjs.min.js"></script>
 
@@ -38,6 +53,8 @@
         <div style="float: left; position: absolute;">
           <input type="range" min="0.01" max="8" value="1.5" id="zoom-range" step="0.001" orient="vertical">
         </div>
+        <button class="arrow-button-vert" id="right-arrow">➤</button>
+
     </div>
 </body>
 <script type="text/javascript">

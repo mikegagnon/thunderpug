@@ -1,8 +1,13 @@
 const FPS = 60;
-const START_SCALE = 1.5;
+const START_SCALE = 1;
 const ZOOM_SLIDER_WIDTH = 40;
 // num millis for the ball to move one square
-BALL_MOVE_INTERVAL = 50;
+const BALL_MOVE_INTERVAL = 50;
+
+const ARROW_BUTTON_VERT_HEIGHT = 100;
+const ARROW_BUTTON_VERT_WIDTH = 25;
+const ARROW_BUTTON_HORZ_HEIGHT = ARROW_BUTTON_VERT_WIDTH;
+const ARROW_BUTTON_HORZ_WIDTH = ARROW_BUTTON_VERT_HEIGHT;
 
 const MAX_ZOOM = 8;
 const MIN_ZOOM = 0.01;
@@ -13,8 +18,8 @@ const BLOCK_TYPES = [
     "block",
 ];
 
-const GAME_NUM_ROWS = 16 * 7;
-const GAME_NUM_COLS = 16 * 7;
+const GAME_NUM_ROWS = 16;// * 7;
+const GAME_NUM_COLS = 16;// * 7;
 const NUM_BLOCKS = 5000;
 //const NUM_BLOCKS = 5;
 
@@ -279,6 +284,7 @@ class Controller {
         this.viz = viz;
         this.enabledMovement = true;
         this.dragStart = null;
+        this.setupArrowButtons();
 
         // https://stackoverflow.com/questions/5597060/detecting-arrow-key-presses-in-javascript
         document.onkeydown = checkKey;
@@ -325,6 +331,16 @@ class Controller {
             THIS.zoomRangeInput(x)
         });
 
+
+
+    }
+
+    setupArrowButtons() {
+        this.rightArrowButton = document.getElementById("right-arrow");
+        this.rightArrowButton.style.height = ARROW_BUTTON_VERT_HEIGHT;
+        this.rightArrowButton.style.width = ARROW_BUTTON_VERT_WIDTH;
+        this.rightArrowButton.style.left = 30;
+        this.rightArrowButton.style.top = this.viz.canvas.height / 2 - ARROW_BUTTON_VERT_HEIGHT / 2;
 
 
     }
