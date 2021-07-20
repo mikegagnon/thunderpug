@@ -1,5 +1,6 @@
 const FPS = 60;
 const START_SCALE = 1.5;
+const ZOOM_SLIDER_WIDTH = 40;
 
 
 const MAX_ZOOM = 8;
@@ -152,8 +153,8 @@ class Viz {
         }
 
         this.canvas = document.getElementsByTagName("canvas")[0];
-        this.canvas.width = document.body.clientWidth;
-        this.canvas.height = document.body.clientHeight - 40; // -30 for slider space
+        this.canvas.width = document.body.clientWidth - ZOOM_SLIDER_WIDTH;
+        this.canvas.height = document.body.clientHeight; // -30 for slider space
 
         this.stage = new createjs.StageGL(this.canvasId);
         createjs.Touch.enable(this.stage);
@@ -268,8 +269,15 @@ class Controller {
             THIS.pressup(evt);
         });
 
+        this.zoomSlider = document.getElementById("zoom-range");
+        this.zoomSlider.style.width = 40;
+        this.zoomSlider.style.height = this.viz.canvas.height;
+        this.zoomSlider.value = START_SCALE;
+        //console.log(this.zoomSlider.style.height);
+
+
         //this.rangeInput = 
-        document.getElementById("zoom-range").addEventListener('input', function(x) {
+        this.zoomSlider.addEventListener("input", function(x) {
             THIS.zoomRangeInput(x)
         });
 
