@@ -153,7 +153,7 @@ class Viz {
         }
 
         this.canvas = document.getElementsByTagName("canvas")[0];
-        this.canvas.width = document.body.clientWidth - ZOOM_SLIDER_WIDTH;
+        this.canvas.width = document.body.clientWidth;// - ZOOM_SLIDER_WIDTH;
         this.canvas.height = document.body.clientHeight; // -30 for slider space
 
         this.stage = new createjs.StageGL(this.canvasId);
