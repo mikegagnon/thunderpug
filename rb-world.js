@@ -18,8 +18,8 @@ const BLOCK_TYPES = [
     "block",
 ];
 
-const GAME_NUM_ROWS = 16;// * 7;
-const GAME_NUM_COLS = 16;// * 7;
+const GAME_NUM_ROWS = 16 * 7;
+const GAME_NUM_COLS = 16 * 7;
 const NUM_BLOCKS = 5000;
 //const NUM_BLOCKS = 5;
 
@@ -337,31 +337,42 @@ class Controller {
 
     setupArrowButtons() {
         const OFFSET = 30;
+        const THIS = this;
+        this.leftArrowButton = document.getElementById("left-arrow");
+        this.leftArrowButton.style.height = ARROW_BUTTON_VERT_HEIGHT;
+        this.leftArrowButton.style.width = ARROW_BUTTON_VERT_WIDTH;
+        this.leftArrowButton.style.left = OFFSET;
+        this.leftArrowButton.style.top = this.viz.canvas.height / 2 - ARROW_BUTTON_VERT_HEIGHT / 2;
+        this.leftArrowButton.onclick = function() {
+            THIS.left();
+        }
 
         this.rightArrowButton = document.getElementById("right-arrow");
         this.rightArrowButton.style.height = ARROW_BUTTON_VERT_HEIGHT;
         this.rightArrowButton.style.width = ARROW_BUTTON_VERT_WIDTH;
-        this.rightArrowButton.style.left = OFFSET;
+        this.rightArrowButton.style.left = this.viz.canvas.width - ARROW_BUTTON_VERT_WIDTH;
         this.rightArrowButton.style.top = this.viz.canvas.height / 2 - ARROW_BUTTON_VERT_HEIGHT / 2;
-
-
-        this.leftArrowButton = document.getElementById("left-arrow");
-        this.leftArrowButton.style.height = ARROW_BUTTON_VERT_HEIGHT;
-        this.leftArrowButton.style.width = ARROW_BUTTON_VERT_WIDTH;
-        this.leftArrowButton.style.left = this.viz.canvas.width - ARROW_BUTTON_VERT_WIDTH;
-        this.leftArrowButton.style.top = this.viz.canvas.height / 2 - ARROW_BUTTON_VERT_HEIGHT / 2;
+        this.rightArrowButton.onclick = function() {
+            THIS.right();
+        }
 
         this.upArrowButton = document.getElementById("up-arrow");
         this.upArrowButton.style.height = ARROW_BUTTON_HORZ_HEIGHT;
         this.upArrowButton.style.width = ARROW_BUTTON_HORZ_WIDTH;
         this.upArrowButton.style.left = OFFSET/2 + this.viz.canvas.width / 2 - ARROW_BUTTON_HORZ_WIDTH / 2;
-        this.upArrowButton.style.top = 0;//this.viz.canvas.height / 2 - ARROW_BUTTON_VERT_HEIGHT / 2;
+        this.upArrowButton.style.top = 0;
+        this.upArrowButton.onclick = function() {
+            THIS.up();
+        }
 
         this.downArrowButton = document.getElementById("down-arrow");
         this.downArrowButton.style.height = ARROW_BUTTON_HORZ_HEIGHT;
         this.downArrowButton.style.width = ARROW_BUTTON_HORZ_WIDTH;
         this.downArrowButton.style.left = OFFSET / 2 + this.viz.canvas.width / 2 - ARROW_BUTTON_HORZ_WIDTH / 2;
         this.downArrowButton.style.top = this.viz.canvas.height- ARROW_BUTTON_VERT_HEIGHT / 2;
+        this.downArrowButton.onclick = function() {
+            THIS.down();
+        }
 
 
     }
