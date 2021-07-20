@@ -1,7 +1,8 @@
 const FPS = 60;
 const START_SCALE = 1.5;
 const ZOOM_SLIDER_WIDTH = 40;
-
+// num millis for the ball to move one square
+BALL_MOVE_INTERVAL = 50;
 
 const MAX_ZOOM = 8;
 const MIN_ZOOM = 0.01;
@@ -69,6 +70,38 @@ class Game {
         if (piece.typ == "ball") {
             this.ball = piece;
         }
+    }
+
+    moveBall(deltaRow, deltaCol) {
+        const newRow = this.ball.row + deltaRow;
+        const newCol = this.ball.col + deltaCol;
+
+        if (newRow < 0 || newRow >= this.numRows || newCol < 0 || newCol >= this.numCols) {
+            // TODO
+            return null;
+        }
+
+        const arrivedAtPiece = this.matrix[newRow][newCol];
+        if (arrivedAtPiece != null && arrivedAtPiece.typ == "block") {
+            // TODO
+            return null;
+        }
+
+        this.matrix[this.ball.row][this.ball.col] = null;
+        this.ball.row = newRow;
+        this.ball.col = newCol;
+        this.matrix[this.ball.row][this.ball.col] = this.ball;
+        this.momentum = {
+            deltaRow: deltaRow,
+            deltaCol: deltaCol,
+        };
+
+        return {
+            deltaRow: deltaRow,
+            deltaCol: deltaCol,
+            newRow: newRow,
+            newCol: newCol,
+        };
     }
 }
 
@@ -227,6 +260,17 @@ class Viz {
             this.stage.update();
         }
     }
+
+    drawBallMove(movement, controllerCallback) {
+        this.movement = movement;
+
+        const destX = movement.newCol * BLOCK_SIZE;
+        const destY = movement.newRow * BLOCK_SIZE;
+
+        createjs.Tween.get(this.game.ball.bitmap)
+            .to({x: destX, y: destY}, BALL_MOVE_INTERVAL, createjs.Ease.linear)
+            .call(controllerCallback);
+    }
 }
 
 class Controller {
@@ -240,6 +284,8 @@ class Controller {
         document.onkeydown = checkKey;
         const THIS = this;
         function checkKey(e) {
+
+            console.log(2);
 
             e = e || window.event;
 
@@ -271,7 +317,7 @@ class Controller {
 
         this.zoomSlider = document.getElementById("zoom-range");
         this.zoomSlider.style.width = 40;
-        this.zoomSlider.style.height = this.viz.canvas.height;
+        this.zoomSlider.style.height = this.viz.canvas.height - 40;
         this.zoomSlider.value = START_SCALE;
         //console.log(this.zoomSlider.style.height);
 
@@ -396,6 +442,7 @@ class Controller {
     }
 
     go(deltaRow, deltaCol) {
+        console.log(1);
         this.disableMove();
 
         const movement = this.game.moveBall(deltaRow, deltaCol);
