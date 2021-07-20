@@ -285,8 +285,6 @@ class Controller {
         const THIS = this;
         function checkKey(e) {
 
-            console.log(2);
-
             e = e || window.event;
 
             if (e.keyCode == '38') {
@@ -333,7 +331,6 @@ class Controller {
 
     zoomRangeInput(x) {
 
-        console.log(x.target.value);
         // Restrict scale
         let scale = x.target.value;
         scale = Math.min(Math.max(MIN_ZOOM, scale), MAX_ZOOM);
@@ -345,11 +342,11 @@ class Controller {
     }
 
     stageMouseDown(evt) {
-        console.log("evt.pointerID", evt.pointerID);
+        //console.log("evt.pointerID", evt.pointerID);
     }
 
     pressmove(evt) {
-        console.log("pressmove");
+        //console.log("pressmove");
 
         if (!this.dragStart) {
             this.viz.camera.trackingBall = false;
@@ -362,7 +359,7 @@ class Controller {
                 x: this.viz.camera.center.x,
                 y: this.viz.camera.center.y,
             };
-            console.log(this.dragStart);
+            //console.log(this.dragStart);
         } else {
             this.containerStart = {
                 x: evt.stageX - this.viz.container.x + this.containerStart.x - this.dragStart.x,
@@ -376,7 +373,7 @@ class Controller {
         };
 
         this.viz.camera.center = newCameraCenter;
-        console.log(this.viz.camera.center);
+        //console.log(this.viz.camera.center);
 
         this.viz.camera.placeCamera();
         this.viz.stage.update();
@@ -384,7 +381,7 @@ class Controller {
     }
 
     pressup(evt) {
-        console.log("pressup");
+        //console.log("pressup");
         this.dragStart = null;
     }
 
@@ -442,7 +439,7 @@ class Controller {
     }
 
     go(deltaRow, deltaCol) {
-        console.log(1);
+        //console.log(1);
         this.disableMove();
 
         const movement = this.game.moveBall(deltaRow, deltaCol);
