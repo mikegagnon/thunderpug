@@ -343,6 +343,13 @@ class Controller {
         this.rightArrowButton.style.top = this.viz.canvas.height / 2 - ARROW_BUTTON_VERT_HEIGHT / 2;
 
 
+        this.leftArrowButton = document.getElementById("left-arrow");
+        this.leftArrowButton.style.height = ARROW_BUTTON_VERT_HEIGHT;
+        this.leftArrowButton.style.width = ARROW_BUTTON_VERT_WIDTH;
+        this.leftArrowButton.style.left = this.viz.canvas.width - ARROW_BUTTON_VERT_WIDTH;
+        this.leftArrowButton.style.top = this.viz.canvas.height / 2 - ARROW_BUTTON_VERT_HEIGHT / 2;
+
+
     }
 
     zoomRangeInput(x) {
