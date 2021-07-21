@@ -1,5 +1,5 @@
 const FPS = 60;
-const START_SCALE = 2;
+const START_SCALE = 0.1;
 const ZOOM_SLIDER_WIDTH = 40;
 // num millis for the ball to move one square
 const BALL_MOVE_INTERVAL = 50;
@@ -319,6 +319,16 @@ class Controller {
             THIS.pressup(evt);
         });
 
+
+        createjs.Tween.get(this.viz.container, {override: true})
+            .to({scaleX: 1.5, scaleY: 1.5, x: 100, y: 100}, 5000, createjs.Ease.getPowIn(3.5))
+            //.to()
+            .addEventListener("change", handleChange);
+        function handleChange(event) {
+            // The tween changed.
+            //console.log(event.target.target);
+            //event.target.target.x = -1000;
+        }
         /*
         this.zoomSlider = document.getElementById("zoom-range");
         this.zoomSlider.style.width = 40;
