@@ -216,14 +216,6 @@ class Viz {
 
         this.drawGrid();
 
-        for (let i = 0; i < this.game.pieces.length; i++) {
-            const piece = this.game.pieces[i];
-            piece.bitmap = new createjs.Bitmap(this.queueResult[piece.typ]);
-            piece.bitmap.x = piece.col * BLOCK_SIZE;
-            piece.bitmap.y = piece.row * BLOCK_SIZE;
-            this.container.addChild(piece.bitmap);
-        }
-
         var trapSheetData = {
             images: [this.queueResult["trap"]],
             frames: {width:16, height:16},
@@ -239,6 +231,23 @@ class Viz {
         animation.y = 0;
         this.container.addChild(animation);
         animation.gotoAndPlay("shut");
+
+        for (let i = 0; i < this.game.pieces.length; i++) {
+            const piece = this.game.pieces[i];
+            piece.bitmap = new createjs.Bitmap(this.queueResult[piece.typ]);
+            /*piece.bitmap.x = piece.col * BLOCK_SIZE;
+            piece.bitmap.y = piece.row * BLOCK_SIZE;
+            this.container.addChild(piece.bitmap);*/
+            const animation = new createjs.Sprite(trapSpriteSheet);
+            animation.x = piece.col * BLOCK_SIZE;
+            animation.y = piece.row * BLOCK_SIZE;
+            const frame = Math.floor(Math.random() * 8);
+            animation.gotoAndPlay(frame);
+
+            this.container.addChild(animation);
+
+        }
+
 
         this.stage.update();
 
