@@ -36,6 +36,31 @@ const PIECES = [
         row: Math.floor(GAME_NUM_ROWS / 2),
         col: Math.floor(GAME_NUM_COLS / 2),
     },
+    {
+        typ: "trap",
+        row: 0,
+        col: 0,
+    },
+    {
+        typ: "trap",
+        row: 1,
+        col: 0,
+    },
+    {
+        typ: "trap",
+        row: 2,
+        col: 0,
+    },
+    {
+        typ: "trap",
+        row: 0,
+        col: 1,
+    },
+    {
+        typ: "trap",
+        row: 0,
+        col: 2,
+    }
 ];
 
 //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
@@ -51,6 +76,8 @@ for (let i = 0; i < NUM_BLOCKS; i++) {
         row: getRandomInt(0, GAME_NUM_ROWS),
         col: getRandomInt(0, GAME_NUM_COLS),
     };
+
+    //if (piece.row)
 
     PIECES.push(piece);
 }
@@ -75,6 +102,10 @@ class Game {
     }
 
     addPiece(piece) {
+        //console.log(this.matrix[piece.row][piece.col], piece);
+        if (this.matrix[piece.row][piece.col] !== undefined) {
+            return;
+        }
         this.matrix[piece.row][piece.col] = piece;
         if (piece.typ == "ball") {
             this.ball = piece;
@@ -239,8 +270,14 @@ class Viz {
 
         this.ballAnimation = null;
 
-        for (let i = 0; i < this.game.pieces.length; i++) {
-            const piece = this.game.pieces[i];
+        //for (let i = 0; i < this.game.pieces.length; i++) {
+        for (let r = 0; r < this.game.matrix.length; r++) {
+        for (let c = 0; c < this.game.matrix[r].length; c++) {
+            const piece = this.game.matrix[r][c];
+            if (!piece) {
+                continue;
+            }
+            //const piece = this.game.pieces[i];
             //piece.bitmap = new createjs.Bitmap(this.queueResult[piece.typ]);
             /*piece.bitmap.x = piece.col * BLOCK_SIZE;
             piece.bitmap.y = piece.row * BLOCK_SIZE;
@@ -262,11 +299,11 @@ class Viz {
             //animation.framerate = 1;
             animation.gotoAndPlay(frame);
             this.container.addChild(animation);*/
-            const r = this.queueResult[piece.typ];
-            const animation = new createjs.Sprite(r.sheet);
+            const z = this.queueResult[piece.typ];
+            const animation = new createjs.Sprite(z.sheet);
             animation.x = piece.col * BLOCK_SIZE;
             animation.y = piece.row * BLOCK_SIZE;
-            r.init(animation);
+            z.init(animation);
             
             this.container.addChild(animation);
 
@@ -275,7 +312,7 @@ class Viz {
             }
 
 
-        }
+        }}
 
 
 
@@ -298,7 +335,8 @@ class Viz {
         this.queueResult["trap"] = {
             sheet: trapSpriteSheet,
             init: function(animation) {
-                animation.gotoAndPlay("shut");
+                //animation.gotoAndPlay("shut");
+                animation.gotoAndStop(0);
             }
         }
 
@@ -350,14 +388,14 @@ class Viz {
     }
 
     drawHorzGridLine(rowIndex, line) {
-        line.graphics.setStrokeStyle(1).beginStroke("#00F");
+        line.graphics.setStrokeStyle(1).beginStroke("#00a");
         line.graphics.moveTo(0, rowIndex * BLOCK_SIZE);
         line.graphics.lineTo(this.game.numCols * BLOCK_SIZE, rowIndex * BLOCK_SIZE);
         line.graphics.endStroke();
     }
 
     drawVertGridLine(colIndex, line) {
-        line.graphics.setStrokeStyle(1).beginStroke("#00F");
+        line.graphics.setStrokeStyle(1).beginStroke("#00a");
         line.graphics.moveTo(colIndex * BLOCK_SIZE, 0);
         line.graphics.lineTo(colIndex * BLOCK_SIZE, this.game.numRows * BLOCK_SIZE);
         line.graphics.endStroke();
