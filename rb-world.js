@@ -17,8 +17,10 @@ const BLOCK_TYPES = [
     "ball",
     "block",
     "trap",
-    "block-sprite",
 ];
+
+
+
 
 const GAME_NUM_ROWS = 16 * 7;
 const GAME_NUM_COLS = 16 * 7;
@@ -131,8 +133,8 @@ class Camera {
     }
 
     centerBall(ball) {
-        const ballX = this.game.ball.bitmap.x;
-        const ballY = this.game.ball.bitmap.y;
+        const ballX = this.viz.ballAnimation.x;
+        const ballY = this.viz.ballAnimation.y;
         this.center.x = (ballX + BLOCK_SIZE / 2) * this.scale;
         this.center.y = (ballY + BLOCK_SIZE / 2) * this.scale;
     }
@@ -181,6 +183,13 @@ class Viz {
         this.mode = mode;
         this.setup();
         this.camera = new Camera(this, this.game, scale);
+
+        this.stage.update();
+        createjs.Ticker.addEventListener("tick", handleTick);
+        const THIS = this;
+        function handleTick(event) {
+            THIS.handleTick(event);
+        }
     }
 
     setup() {
@@ -188,11 +197,13 @@ class Viz {
 
 
         
-        this.queueResult = {};
-        for (let i = 0; i < BLOCK_TYPES.length; i++) {
+        //this.queueResult = {};
+        /*for (let i = 0; i < BLOCK_TYPES.length; i++) {
             const typ = BLOCK_TYPES[i];
             this.queueResult[typ] = this.queue.getResult(typ);
-        }
+        }*/
+
+        this.setupSprites();
 
         this.canvas = document.getElementsByTagName("canvas")[0];
         this.canvas.width = document.body.clientWidth;// - ZOOM_SLIDER_WIDTH;
@@ -217,26 +228,8 @@ class Viz {
 
         this.drawGrid();
 
-        var trapSheetData = {
-            images: [this.queueResult["trap"]],
-            frames: {width:16, height:16},
-            animations: {
-                still:0,
-                shut:[0,8,"shut"],
-            }
-        };
-        var trapSpriteSheet = new createjs.SpriteSheet(trapSheetData);
-        var animation = new createjs.Sprite(trapSpriteSheet);
 
-        var blockSheetData = {
-            images: [this.queueResult["block-sprite"]],
-            frames: {width:16, height:16},
-            animations: {
-                color:[0,11,"color"],
-            },
-        };
-        var blockSpriteSheet = new createjs.SpriteSheet(blockSheetData);
-        blockSpriteSheet.framerate = 10;
+
         /*var animation = new createjs.Sprite(trapSpriteSheet);
 
         animation.x = 0;
@@ -244,9 +237,11 @@ class Viz {
         this.container.addChild(animation);
         animation.gotoAndPlay("shut");*/
 
+        this.ballAnimation = null;
+
         for (let i = 0; i < this.game.pieces.length; i++) {
             const piece = this.game.pieces[i];
-            piece.bitmap = new createjs.Bitmap(this.queueResult[piece.typ]);
+            //piece.bitmap = new createjs.Bitmap(this.queueResult[piece.typ]);
             /*piece.bitmap.x = piece.col * BLOCK_SIZE;
             piece.bitmap.y = piece.row * BLOCK_SIZE;
             this.container.addChild(piece.bitmap);*/
@@ -259,24 +254,84 @@ class Viz {
             animation.gotoAndPlay(frame);
             this.container.addChild(animation);*/
 
+            /*
             const animation = new createjs.Sprite(blockSpriteSheet);
             animation.x = piece.col * BLOCK_SIZE;
             animation.y = piece.row * BLOCK_SIZE;
             const frame = Math.floor(Math.random() * 12);
             //animation.framerate = 1;
             animation.gotoAndPlay(frame);
+            this.container.addChild(animation);*/
+            const r = this.queueResult[piece.typ];
+            const animation = new createjs.Sprite(r.sheet);
+            animation.x = piece.col * BLOCK_SIZE;
+            animation.y = piece.row * BLOCK_SIZE;
+            r.init(animation);
+            
             this.container.addChild(animation);
+
+            if (piece.typ == "ball") {
+                this.ballAnimation = animation;
+            }
 
 
         }
 
 
-        this.stage.update();
 
-        createjs.Ticker.addEventListener("tick", handleTick);
-        const THIS = this;
-        function handleTick(event) {
-            THIS.handleTick(event);
+    }
+
+    setupSprites() {
+        this.queueResult = {};
+
+        const trapSheetData = {
+            images: [this.queue.getResult("trap")],
+            frames: {width:16, height:16},
+            animations: {
+                still:0,
+                shut:[0,8,"shut"],
+            }
+        };
+        const trapSpriteSheet = new createjs.SpriteSheet(trapSheetData);
+        //const trapAnimation = new createjs.Sprite(trapSpriteSheet);
+        //this.queueResult["trap"] = trapAnimation;
+        this.queueResult["trap"] = {
+            sheet: trapSpriteSheet,
+            init: function(animation) {
+                animation.gotoAndPlay("shut");
+            }
+        }
+
+        var blockSheetData = {
+            images: [this.queue.getResult("block")],
+            frames: {width:16, height:16},
+            animations: {
+                color:[0,11,"color"],
+            },
+        };
+        const blockSpriteSheet = new createjs.SpriteSheet(blockSheetData);
+        blockSpriteSheet.framerate = 10;
+        //const blockAnimation = new createjs.Sprite(blockSpriteSheet);
+        this.queueResult["block"] = {
+            sheet: blockSpriteSheet,
+            init: function(animation) {
+                //animation.gotoAndPlay("color");
+                const frame = Math.floor(Math.random() * 12);
+                //animation.framerate = 1;
+                animation.gotoAndPlay(frame);
+            }
+        }
+
+        const ballSheetData = {
+            images: [this.queue.getResult("ball")],
+            frames: {width:16, height:16},
+        };
+        const ballSpriteSheet = new createjs.SpriteSheet(ballSheetData);
+
+
+        this.queueResult["ball"] = {
+            sheet: ballSpriteSheet,
+            init: function(){}
         }
     }
 
@@ -322,7 +377,7 @@ class Viz {
         const destX = movement.newCol * BLOCK_SIZE;
         const destY = movement.newRow * BLOCK_SIZE;
 
-        createjs.Tween.get(this.game.ball.bitmap)
+        createjs.Tween.get(this.ballAnimation)
             .to({x: destX, y: destY}, BALL_MOVE_INTERVAL, createjs.Ease.linear)
             .call(controllerCallback);
     }
@@ -577,9 +632,8 @@ function initRbWorld() {
     queue.on("complete", handleComplete, this);
     queue.loadManifest([
         {id: "ball", src:"ball-16.png"},
-        {id: "block", src:"block-16.png"},
+        {id: "block", src:"block-sprite.png"},
         {id: "trap", src:"trap.png"},
-        {id: "block-sprite", src:"block-sprite.png"},
     ]);
     function handleComplete() {
         if (MODE == "play") {
