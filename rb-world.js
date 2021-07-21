@@ -16,6 +16,7 @@ const BLOCK_SIZE = 16;
 const BLOCK_TYPES = [
     "ball",
     "block",
+    "trap",
 ];
 
 const GAME_NUM_ROWS = 16 * 7;
@@ -184,6 +185,8 @@ class Viz {
     setup() {
         createjs.Ticker.framerate = FPS;
 
+
+        
         this.queueResult = {};
         for (let i = 0; i < BLOCK_TYPES.length; i++) {
             const typ = BLOCK_TYPES[i];
@@ -220,6 +223,22 @@ class Viz {
             piece.bitmap.y = piece.row * BLOCK_SIZE;
             this.container.addChild(piece.bitmap);
         }
+
+        var trapSheetData = {
+            images: [this.queueResult["trap"]],
+            frames: {width:16, height:16},
+            animations: {
+                still:0,
+                shut:[0,8,"shut"],
+            }
+        };
+        var trapSpriteSheet = new createjs.SpriteSheet(trapSheetData);
+        var animation = new createjs.Sprite(trapSpriteSheet);
+
+        animation.x = 0;
+        animation.y = 0;
+        this.container.addChild(animation);
+        animation.gotoAndPlay("shut");
 
         this.stage.update();
 
@@ -321,7 +340,7 @@ class Controller {
 
 
         createjs.Tween.get(this.viz.container, {override: true})
-            .to({scaleX: 1.5, scaleY: 1.5, x: 100, y: 100}, 5000, createjs.Ease.getPowIn(3.5))
+            .to({scaleX: 1.5, scaleY: 1.5, x: 100, y: 100}, 0, createjs.Ease.getPowIn(3.5))
             //.to()
             .addEventListener("change", handleChange);
         function handleChange(event) {
@@ -528,6 +547,7 @@ function initRbWorld() {
     queue.loadManifest([
         {id: "ball", src:"ball-16.png"},
         {id: "block", src:"block-16.png"},
+        {id: "trap", src:"trap.png"},
     ]);
     function handleComplete() {
         if (MODE == "play") {
