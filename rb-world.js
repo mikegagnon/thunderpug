@@ -17,6 +17,7 @@ const BLOCK_TYPES = [
     "ball",
     "block",
     "trap",
+    "block-sprite",
 ];
 
 const GAME_NUM_ROWS = 16 * 7;
@@ -227,10 +228,21 @@ class Viz {
         var trapSpriteSheet = new createjs.SpriteSheet(trapSheetData);
         var animation = new createjs.Sprite(trapSpriteSheet);
 
+        var blockSheetData = {
+            images: [this.queueResult["block-sprite"]],
+            frames: {width:16, height:16},
+            animations: {
+                color:[0,11,"color"],
+            },
+        };
+        var blockSpriteSheet = new createjs.SpriteSheet(blockSheetData);
+        blockSpriteSheet.framerate = 10;
+        /*var animation = new createjs.Sprite(trapSpriteSheet);
+
         animation.x = 0;
         animation.y = 0;
         this.container.addChild(animation);
-        animation.gotoAndPlay("shut");
+        animation.gotoAndPlay("shut");*/
 
         for (let i = 0; i < this.game.pieces.length; i++) {
             const piece = this.game.pieces[i];
@@ -238,13 +250,23 @@ class Viz {
             /*piece.bitmap.x = piece.col * BLOCK_SIZE;
             piece.bitmap.y = piece.row * BLOCK_SIZE;
             this.container.addChild(piece.bitmap);*/
+
+            /*
             const animation = new createjs.Sprite(trapSpriteSheet);
             animation.x = piece.col * BLOCK_SIZE;
             animation.y = piece.row * BLOCK_SIZE;
             const frame = Math.floor(Math.random() * 8);
             animation.gotoAndPlay(frame);
+            this.container.addChild(animation);*/
 
+            const animation = new createjs.Sprite(blockSpriteSheet);
+            animation.x = piece.col * BLOCK_SIZE;
+            animation.y = piece.row * BLOCK_SIZE;
+            const frame = Math.floor(Math.random() * 12);
+            //animation.framerate = 1;
+            animation.gotoAndPlay(frame);
             this.container.addChild(animation);
+
 
         }
 
@@ -290,7 +312,7 @@ class Viz {
         if (this.camera.trackingBall) {
             this.camera.centerBall();
             this.camera.placeCamera();
-            this.stage.update();
+            this.stage.update(event);
         }
     }
 
@@ -557,6 +579,7 @@ function initRbWorld() {
         {id: "ball", src:"ball-16.png"},
         {id: "block", src:"block-16.png"},
         {id: "trap", src:"trap.png"},
+        {id: "block-sprite", src:"block-sprite.png"},
     ]);
     function handleComplete() {
         if (MODE == "play") {
