@@ -14,6 +14,7 @@ const MIN_ZOOM = 0.01;
 const BLOCK_SIZE = 16;
 
 const BLOCK_TYPES = [
+    "spawn",
     "ball",
     "block",
     "trap",
@@ -38,6 +39,11 @@ const NUM_BLOCKS = 5//000;
 ];*/
 
 const PIECES = [
+    {
+        typ: "spawn",
+        row: Math.floor(GAME_NUM_ROWS / 2),
+        col: Math.floor(GAME_NUM_COLS / 2),
+    },
     {
         typ: "ball",
         row: Math.floor(GAME_NUM_ROWS / 2),
@@ -350,6 +356,8 @@ class Viz {
                 drawSprite(piece, "trap-floor");
             } else if (piece.typ == "block") {
                 drawSprite(piece, "block");
+            } else if (piece.typ == "spawn") {
+                drawSprite(piece, "spawn");
             }
         });
 
@@ -428,6 +436,24 @@ class Viz {
 
     setupSprites() {
         this.queueResult = {};
+
+        const spawnSheetData = {
+            images: [this.queue.getResult("spawn")],
+            frames: {width:16, height:16},
+            animations: {
+                still:0,
+            }
+        };
+        const spawnSpriteSheet = new createjs.SpriteSheet(spawnSheetData);
+        //const trapAnimation = new createjs.Sprite(trapSpriteSheet);
+        //this.queueResult["trap"] = trapAnimation;
+        this.queueResult["spawn"] = {
+            sheet: spawnSpriteSheet,
+            init: function(animation) {
+                //animation.gotoAndPlay("shut");
+                animation.gotoAndStop(0);
+            },
+        };
 
         const trapFloorSheetData = {
             images: [this.queue.getResult("trap-floor")],
@@ -807,6 +833,7 @@ function initRbWorld() {
     const queue = new createjs.LoadQueue();
     queue.on("complete", handleComplete, this);
     queue.loadManifest([
+        {id: "spawn", src:"spawn.png"},
         {id: "ball", src:"ball-16.png"},
         {id: "block", src:"block-sprite.png"},
         {id: "trap-floor", src:"trap-floor.png"},
