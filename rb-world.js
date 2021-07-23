@@ -30,6 +30,13 @@ const NUM_BLOCKS = 5//000;
 //const GAME_NUM_ROWS = 5;
 //const GAME_NUM_COLS = 5;
 
+/*PIECE_DRAW_ORDER = [
+    "trap-floor",
+    "block",
+    "ball",
+    "trap-ceil"
+];*/
+
 const PIECES = [
     {
         typ: "ball",
@@ -104,21 +111,35 @@ class Game {
         }
     }
 
+    forEachPiece(callback) {
+        for (let row = 0; row < this.numRows; row++) {
+            for (let col = 0; col < this.numCols; col++) {
+                const piece = this.matrix[row][col];
+                //console.log(piece);
+                if (piece) {
+                    callback(piece);
+                }
+            }
+        }
+
+    }
+
     addPiece(piece) {
         if (piece.typ === "ball") {
             this.ball = piece;
             return;
         }
-        let cell = [];
-        if (this.matrix[piece.row][piece.col] !== undefined) {
-            cell = this.matrix[piece.row][piece.col];
+        //let cell = [];
+        if (this.matrix[piece.row][piece.col] === undefined) {
+            //cell = this.matrix[piece.row][piece.col];
+            this.matrix[piece.row][piece.col] = piece;
         }
-        cell.push(piece);
-        this.matrix[piece.row][piece.col] = cell;
+        //cell.push(piece);
+        //this.matrix[piece.row][piece.col] = cell;
 
     }
 
-    cellContainsTyp(cell, typ) {
+    /*cellContainsTyp(cell, typ) {
         if (cell === undefined) {
             return false;
         }
@@ -138,7 +159,7 @@ class Game {
 
     cellContainsTrap(cell) {
         return this.cellContainsTyp(cell, "trap");
-    }
+    }*/
 
     moveBall(deltaRow, deltaCol) {
         const newRow = this.ball.row + deltaRow;
@@ -149,18 +170,20 @@ class Game {
             return null;
         }
 
-        const arrivedAtCell = this.matrix[newRow][newCol];
-        //if (arrivedAtPiece != null && arrivedAtPiece.typ == "block") {
-        if (this.cellContainsBlock(arrivedAtCell)) {
+        //const arrivedAtCell = this.matrix[newRow][newCol];
+        const arrivedAtPiece = this.matrix[newRow][newCol];
+        //
+        if (arrivedAtPiece != undefined && arrivedAtPiece.typ == "block") {
+        //if (this.cellContainsBlock(arrivedAtCell)) {
             // TODO
             return null;
         }
 
-        //let trapped = false;
-        //if (arrivedAtPiece != null && arrivedAtPiece.typ == "trap") {
-        //    trapped = true; 
-        //}
-        const trapped = this.cellContainsTrap(arrivedAtCell);
+        let trapped = false;
+        if (arrivedAtPiece != null && arrivedAtPiece.typ == "trap") {
+            trapped = true; 
+        }
+        //const trapped = this.cellContainsTrap(arrivedAtCell);
 
 
         //this.matrix[this.ball.row][this.ball.col] = null;
@@ -305,23 +328,47 @@ class Viz {
         this.container.addChild(animation);
         animation.gotoAndPlay("shut");*/
 
+        const THIS = this;
+        function drawSprite(piece) {
+            const z = THIS.queueResult[piece.typ];
+            const animation = new createjs.Sprite(z.sheet);
+            animation.x = piece.col * BLOCK_SIZE;
+            animation.y = piece.row * BLOCK_SIZE;
+            z.init(animation);
+            THIS.container.addChild(animation);
+        }
+
+        this.game.forEachPiece(function(piece) {
+            //console.log(1);
+            if (piece.typ == "trap" || piece.typ == "block") {
+                drawSprite(piece);
+            }
+        });
+
+        // Draw ball
         this.ballAnimation = null;
         const z = this.queueResult["ball"];
         this.ballAnimation = new createjs.Sprite(z.sheet);
         this.ballAnimation.x = this.game.ball.col * BLOCK_SIZE;
         this.ballAnimation.y = this.game.ball.row * BLOCK_SIZE;
         z.init(this.ballAnimation);
-        
         this.container.addChild(this.ballAnimation);
+
+        this.game.forEachPiece(function(piece) {
+            //console.log(1);
+            if (piece.typ == "trap") {
+                drawSprite(piece);
+            }
+        });
 
         //for (let i = 0; i < this.game.pieces.length; i++) {
         for (let r = 0; r < this.game.matrix.length; r++) {
         for (let c = 0; c < this.game.matrix[r].length; c++) {
-            const cell = this.game.matrix[r][c];
+            /*const cell = this.game.matrix[r][c];
             if (!cell) {
                 continue;
             }
-            const piece = cell[0];
+            const piece = cell[0];*/
             //const piece = this.game.pieces[i];
             //piece.bitmap = new createjs.Bitmap(this.queueResult[piece.typ]);
             /*piece.bitmap.x = piece.col * BLOCK_SIZE;
@@ -344,6 +391,11 @@ class Viz {
             //animation.framerate = 1;
             animation.gotoAndPlay(frame);
             this.container.addChild(animation);*/
+            
+
+
+
+            /*
             const z = this.queueResult[piece.typ];
             const animation = new createjs.Sprite(z.sheet);
             animation.x = piece.col * BLOCK_SIZE;
@@ -351,6 +403,9 @@ class Viz {
             z.init(animation);
             
             this.container.addChild(animation);
+
+
+            */
 
             /*if (piece.typ == "ball") {
                 this.ballAnimation = animation;
