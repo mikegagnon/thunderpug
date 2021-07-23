@@ -471,6 +471,7 @@ class Viz {
             init: function(animation) {
                 //animation.gotoAndPlay("shut");
                 animation.gotoAndStop(0);
+                //animation.framerate = 1;
             },
         };
 
@@ -483,6 +484,8 @@ class Viz {
             }
         };
         const trapCeilSpriteSheet = new createjs.SpriteSheet(trapCeilSheetData);
+        trapCeilSpriteSheet.framerate = 20;
+
         //const trapAnimation = new createjs.Sprite(trapSpriteSheet);
         //this.queueResult["trap"] = trapAnimation;
         this.queueResult["trap-ceil"] = {
