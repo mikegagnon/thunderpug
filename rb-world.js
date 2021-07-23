@@ -329,8 +329,9 @@ class Viz {
         animation.gotoAndPlay("shut");*/
 
         const THIS = this;
-        function drawSprite(piece) {
-            const z = THIS.queueResult[piece.typ];
+        function drawSprite(piece, spriteName) {
+            console.log(spriteName)
+            const z = THIS.queueResult[spriteName];
             const animation = new createjs.Sprite(z.sheet);
             animation.x = piece.col * BLOCK_SIZE;
             animation.y = piece.row * BLOCK_SIZE;
@@ -340,8 +341,10 @@ class Viz {
 
         this.game.forEachPiece(function(piece) {
             //console.log(1);
-            if (piece.typ == "trap" || piece.typ == "block") {
-                drawSprite(piece);
+            if (piece.typ == "trap") {
+                drawSprite(piece, "trap-floor");
+            } else if (piece.typ == "block") {
+                drawSprite(piece, "block");
             }
         });
 
@@ -357,7 +360,7 @@ class Viz {
         this.game.forEachPiece(function(piece) {
             //console.log(1);
             if (piece.typ == "trap") {
-                drawSprite(piece);
+                drawSprite(piece, "trap-ceil");
             }
         });
 
@@ -421,23 +424,42 @@ class Viz {
     setupSprites() {
         this.queueResult = {};
 
-        const trapSheetData = {
-            images: [this.queue.getResult("trap")],
+        const trapFloorSheetData = {
+            images: [this.queue.getResult("trap-floor")],
             frames: {width:16, height:16},
             animations: {
                 still:0,
                 shut:[0,8,"shut"],
             }
         };
-        const trapSpriteSheet = new createjs.SpriteSheet(trapSheetData);
+        const trapFloorSpriteSheet = new createjs.SpriteSheet(trapFloorSheetData);
         //const trapAnimation = new createjs.Sprite(trapSpriteSheet);
         //this.queueResult["trap"] = trapAnimation;
-        this.queueResult["trap"] = {
-            sheet: trapSpriteSheet,
+        this.queueResult["trap-floor"] = {
+            sheet: trapFloorSpriteSheet,
             init: function(animation) {
                 //animation.gotoAndPlay("shut");
                 animation.gotoAndStop(0);
+            },
+        };
+
+        const trapCeilSheetData = {
+            images: [this.queue.getResult("trap-ceil")],
+            frames: {width:16, height:16},
+            animations: {
+                still:0,
+                shut:[0,12,"still"],
             }
+        };
+        const trapCeilSpriteSheet = new createjs.SpriteSheet(trapCeilSheetData);
+        //const trapAnimation = new createjs.Sprite(trapSpriteSheet);
+        //this.queueResult["trap"] = trapAnimation;
+        this.queueResult["trap-ceil"] = {
+            sheet: trapCeilSpriteSheet,
+            init: function(animation) {
+                //animation.gotoAndPlay("shut");
+                animation.gotoAndStop(0);
+            },
         }
 
         var blockSheetData = {
@@ -772,7 +794,9 @@ function initRbWorld() {
     queue.loadManifest([
         {id: "ball", src:"ball-16.png"},
         {id: "block", src:"block-sprite.png"},
-        {id: "trap", src:"trap.png"},
+        {id: "trap-floor", src:"trap-floor.png"},
+        {id: "trap-ceil", src:"trap-ceil.png"},
+
     ]);
     function handleComplete() {
         if (MODE == "play") {
