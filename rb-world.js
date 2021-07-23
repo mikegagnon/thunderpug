@@ -1,5 +1,5 @@
 const FPS = 60;
-const START_SCALE = 0.1;
+const START_SCALE = 1.5;
 const ZOOM_SLIDER_WIDTH = 40;
 // num millis for the ball to move one square
 const BALL_MOVE_INTERVAL = 50;
@@ -22,9 +22,9 @@ const BLOCK_TYPES = [
 
 
 
-const GAME_NUM_ROWS = 16 * 7;
-const GAME_NUM_COLS = 16 * 7;
-const NUM_BLOCKS = 5000;
+const GAME_NUM_ROWS = 16;// * 7;
+const GAME_NUM_COLS = 16;// * 7;
+const NUM_BLOCKS = 5//000;
 //const NUM_BLOCKS = 5;
 
 //const GAME_NUM_ROWS = 5;
@@ -127,6 +127,12 @@ class Game {
             return null;
         }
 
+        let trapped = false;
+        if (arrivedAtPiece != null && arrivedAtPiece.typ == "trap") {
+            trapped = true; 
+        }
+
+
         this.matrix[this.ball.row][this.ball.col] = null;
         this.ball.row = newRow;
         this.ball.col = newCol;
@@ -141,6 +147,7 @@ class Game {
             deltaCol: deltaCol,
             newRow: newRow,
             newCol: newCol,
+            trapped: trapped,
         };
     }
 }
@@ -356,7 +363,7 @@ class Viz {
                 //animation.gotoAndPlay("color");
                 const frame = Math.floor(Math.random() * 12);
                 //animation.framerate = 1;
-                animation.gotoAndPlay(frame);
+                animation.gotoAndStop(frame);
             }
         }
 
@@ -463,6 +470,7 @@ class Controller {
         });
 
 
+        /*
         createjs.Tween.get(this.viz.container, {override: true})
             .to({scaleX: 1.5, scaleY: 1.5, x: 100, y: 100}, 0, createjs.Ease.getPowIn(3.5))
             //.to()
@@ -471,7 +479,7 @@ class Controller {
             // The tween changed.
             //console.log(event.target.target);
             //event.target.target.x = -1000;
-        }
+        }*/
         /*
         this.zoomSlider = document.getElementById("zoom-range");
         this.zoomSlider.style.width = 40;
