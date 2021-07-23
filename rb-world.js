@@ -162,6 +162,13 @@ class Game {
     }*/
 
     moveBall(deltaRow, deltaCol) {
+        const beforePiece = this.matrix[this.ball.row][this.ball.col];
+
+        if (beforePiece && beforePiece.typ === "trap") {
+            return { trapped: beforePiece};
+        }
+
+
         const newRow = this.ball.row + deltaRow;
         const newCol = this.ball.col + deltaCol;
 
@@ -179,10 +186,7 @@ class Game {
             return null;
         }
 
-        let trapped = false;
-        if (arrivedAtPiece != null && arrivedAtPiece.typ == "trap") {
-            trapped = true; 
-        }
+        
         //const trapped = this.cellContainsTrap(arrivedAtCell);
 
 
@@ -200,7 +204,7 @@ class Game {
             deltaCol: deltaCol,
             newRow: newRow,
             newCol: newCol,
-            trapped: trapped,
+            //trapped: trapped,
         };
     }
 }
@@ -337,6 +341,7 @@ class Viz {
             animation.y = piece.row * BLOCK_SIZE;
             z.init(animation);
             THIS.container.addChild(animation);
+            return animation;
         }
 
         this.game.forEachPiece(function(piece) {
@@ -360,7 +365,7 @@ class Viz {
         this.game.forEachPiece(function(piece) {
             //console.log(1);
             if (piece.typ == "trap") {
-                drawSprite(piece, "trap-ceil");
+                piece.animation = drawSprite(piece, "trap-ceil");
             }
         });
 
@@ -532,7 +537,7 @@ class Viz {
     }
 
     drawBallMove(movement, controllerCallback) {
-        this.movement = movement;
+        //this.movement = movement;
 
         const destX = movement.newCol * BLOCK_SIZE;
         const destY = movement.newRow * BLOCK_SIZE;
@@ -540,6 +545,11 @@ class Viz {
         createjs.Tween.get(this.ballAnimation)
             .to({x: destX, y: destY}, BALL_MOVE_INTERVAL, createjs.Ease.linear)
             .call(controllerCallback);
+    }
+
+    drawTrapShut(movement, controllerCallback) {
+        movement.trapped.animation.gotoAndPlay("shut");
+
     }
 }
 
@@ -771,7 +781,12 @@ class Controller {
         this.disableMove();
 
         const movement = this.game.moveBall(deltaRow, deltaCol);
-        if (movement) {
+        if (movement && movement.trapped) {
+            const THIS = this;
+            this.viz.drawTrapShut(movement, function(){
+                //THIS.go(deltaRow, deltaCol);
+            });
+        } else if (movement) {
             const THIS = this;
             this.viz.drawBallMove(movement, function(){
                 THIS.go(deltaRow, deltaCol);
