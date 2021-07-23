@@ -93,6 +93,9 @@ class Game {
 
         for (let row = 0; row < this.numRows; row++) {
             this.matrix[row] = new Array(this.numRows);
+            /*for (let col = 0; col < this.numCols; col++) {
+                this.matrix[row][col] = undefined;
+            }*/
         }
 
         for (let i = 0; i < this.pieces.length; i++) {
@@ -102,14 +105,39 @@ class Game {
     }
 
     addPiece(piece) {
-        //console.log(this.matrix[piece.row][piece.col], piece);
-        if (this.matrix[piece.row][piece.col] !== undefined) {
+        if (piece.typ === "ball") {
+            this.ball = piece;
             return;
         }
-        this.matrix[piece.row][piece.col] = piece;
-        if (piece.typ == "ball") {
-            this.ball = piece;
+        let cell = [];
+        if (this.matrix[piece.row][piece.col] !== undefined) {
+            cell = this.matrix[piece.row][piece.col];
         }
+        cell.push(piece);
+        this.matrix[piece.row][piece.col] = cell;
+
+    }
+
+    cellContainsTyp(cell, typ) {
+        if (cell === undefined) {
+            return false;
+        }
+        for (let i = 0; i < cell.length; i++) {
+            const piece = cell[i];
+            if (piece.typ === typ) {
+                console.log(true);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    cellContainsBlock(cell) {
+        return this.cellContainsTyp(cell, "block");
+    }
+
+    cellContainsTrap(cell) {
+        return this.cellContainsTyp(cell, "trap");
     }
 
     moveBall(deltaRow, deltaCol) {
@@ -121,22 +149,24 @@ class Game {
             return null;
         }
 
-        const arrivedAtPiece = this.matrix[newRow][newCol];
-        if (arrivedAtPiece != null && arrivedAtPiece.typ == "block") {
+        const arrivedAtCell = this.matrix[newRow][newCol];
+        //if (arrivedAtPiece != null && arrivedAtPiece.typ == "block") {
+        if (this.cellContainsBlock(arrivedAtCell)) {
             // TODO
             return null;
         }
 
-        let trapped = false;
-        if (arrivedAtPiece != null && arrivedAtPiece.typ == "trap") {
-            trapped = true; 
-        }
+        //let trapped = false;
+        //if (arrivedAtPiece != null && arrivedAtPiece.typ == "trap") {
+        //    trapped = true; 
+        //}
+        const trapped = this.cellContainsTrap(arrivedAtCell);
 
 
-        this.matrix[this.ball.row][this.ball.col] = null;
+        //this.matrix[this.ball.row][this.ball.col] = null;
         this.ball.row = newRow;
         this.ball.col = newCol;
-        this.matrix[this.ball.row][this.ball.col] = this.ball;
+        //this.matrix[this.ball.row][this.ball.col] = this.ball;
         this.momentum = {
             deltaRow: deltaRow,
             deltaCol: deltaCol,
@@ -276,14 +306,22 @@ class Viz {
         animation.gotoAndPlay("shut");*/
 
         this.ballAnimation = null;
+        const z = this.queueResult["ball"];
+        this.ballAnimation = new createjs.Sprite(z.sheet);
+        this.ballAnimation.x = this.game.ball.col * BLOCK_SIZE;
+        this.ballAnimation.y = this.game.ball.row * BLOCK_SIZE;
+        z.init(this.ballAnimation);
+        
+        this.container.addChild(this.ballAnimation);
 
         //for (let i = 0; i < this.game.pieces.length; i++) {
         for (let r = 0; r < this.game.matrix.length; r++) {
         for (let c = 0; c < this.game.matrix[r].length; c++) {
-            const piece = this.game.matrix[r][c];
-            if (!piece) {
+            const cell = this.game.matrix[r][c];
+            if (!cell) {
                 continue;
             }
+            const piece = cell[0];
             //const piece = this.game.pieces[i];
             //piece.bitmap = new createjs.Bitmap(this.queueResult[piece.typ]);
             /*piece.bitmap.x = piece.col * BLOCK_SIZE;
@@ -314,9 +352,9 @@ class Viz {
             
             this.container.addChild(animation);
 
-            if (piece.typ == "ball") {
+            /*if (piece.typ == "ball") {
                 this.ballAnimation = animation;
-            }
+            }*/
 
 
         }}
