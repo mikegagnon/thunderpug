@@ -18,6 +18,7 @@ const BLOCK_TYPES = [
     "ball",
     "block",
     "trap",
+    "token",
 ];
 
 
@@ -72,6 +73,11 @@ const PIECES = [
     {
         typ: "trap",
         row: 0,
+        col: 2,
+    },
+    {
+        typ: "token",
+        row: 2,
         col: 2,
     }
 ];
@@ -358,6 +364,8 @@ class Viz {
                 drawSprite(piece, "block");
             } else if (piece.typ == "spawn") {
                 drawSprite(piece, "spawn");
+            } else if (piece.typ == "token") {
+                drawSprite(piece, "token")
             }
         });
 
@@ -452,6 +460,25 @@ class Viz {
             init: function(animation) {
                 //animation.gotoAndPlay("shut");
                 animation.gotoAndStop(0);
+            },
+        };
+
+        const tokenSheetData = {
+            images: [this.queue.getResult("token")],
+            frames: {width:16, height:16},
+            animations: {
+                color:[0,15,"color"],
+            }
+        };
+        const tokenSpriteSheet = new createjs.SpriteSheet(tokenSheetData);
+        //const trapAnimation = new createjs.Sprite(trapSpriteSheet);
+        //this.queueResult["trap"] = trapAnimation;
+        this.queueResult["token"] = {
+            sheet: tokenSpriteSheet,
+            init: function(animation) {
+                //animation.gotoAndPlay("shut");
+                animation.gotoAndPlay("color");
+                animation.framerate = 20;
             },
         };
 
@@ -577,8 +604,9 @@ class Viz {
     }
 
     drawTrapShut(movement, controllerCallback) {
+        console.log("1");
+        movement.trapped.animation.on("animationend",controllerCallback);
         movement.trapped.animation.gotoAndPlay("shut");
-
     }
 }
 
@@ -813,7 +841,9 @@ class Controller {
         if (movement && movement.trapped) {
             const THIS = this;
             this.viz.drawTrapShut(movement, function(){
-                //THIS.go(deltaRow, deltaCol);
+                console.log(2);
+                THIS.game.respawn();
+                THIS.viz.respawn();
             });
         } else if (movement) {
             const THIS = this;
@@ -841,6 +871,7 @@ function initRbWorld() {
         {id: "block", src:"block-sprite.png"},
         {id: "trap-floor", src:"trap-floor.png"},
         {id: "trap-ceil", src:"trap-ceil.png"},
+        {id: "token", src:"token-sprite.png"},
 
     ]);
     function handleComplete() {
