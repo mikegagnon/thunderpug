@@ -23,7 +23,8 @@ const BLOCK_TYPES = [
 
 
 
-
+const WORLD_ROWS = 7;
+const WORLD_COLS = 7;
 const GAME_NUM_ROWS = 16;// * 7;
 const GAME_NUM_COLS = 16;// * 7;
 const NUM_BLOCKS = 5//000;
@@ -98,16 +99,22 @@ function getRandomInt(min, max) {
     PIECES.push(piece);
 }*/
 
-class LevelGenerator{
+class LevelGenerator {
 
-    constructor(world, stageRow, stageCol, numRows, numCols) {
+    constructor(world, numWorldRows, numWorldCols, worldRow, worldCol, numRows, numCols) {
         this.world = world;
-        this.stageRow = stageRow;
-        this.stageCol = stageCol;
+        this.numWorldRows = numWorldRows;
+        this.numWorldCols = numWorldCols;
+        //this.worldRow = worldRow;
+        //this.worldCol = worldCol;
         this.numRows = numRows;
         this.numCols = numCols;
 
-        this.pieces = [];
+        this.stage = {
+            worldRow: worldRow,
+            worldCol: worldCol,
+            pieces: [],
+        };
         this.matrix = new Array(this.numRows);
         for (let row = 0; row < this.numRows; row++) {
             this.matrix[row] = new Array(this.numRows);
@@ -117,16 +124,33 @@ class LevelGenerator{
         this.buildBorder();
         this.buildSpawn();
 
-        this.lev = JSON.stringify(this.pieces);
+        this.insertIntoWorld();
+        //this.lev = JSON.stringify(this.stage);
+    }
+
+    insertIntoWorld() {
+        for (let i = 0; i < this.world.length; i++) {
+            if (this.world[i].worldRow == this.stage.worldRow && this.world[i].worldCol == this.stage.worldCol) {
+                this.world[i].pieces = this.stage.pieces;
+                return;
+            }
+        }
+
+        this.world.push(this.stage);
+        console.log(JSON.stringify(this.world));
+    }
+
+    logWorld() {
+
     }
 
     // TODO: bottom-most and right-most stages should not have exits
     buildExits() {
-        if (this.stageRow > 0) {
+        if (this.stage.worldRow > 0) {
             // build top exit based on stage from above
             throw new Error("unimplemented");
         }
-        if (this.stageCol > 0) {
+        if (this.stage.worldCol > 0) {
             // build left exit based on stage from left
             throw new Error("unimplemented");
         }
@@ -162,7 +186,7 @@ class LevelGenerator{
                 row: row,
                 col: col,
             }
-            this.pieces.push(piece);
+            this.stage.pieces.push(piece);
             this.matrix[row][col] = piece;
         }
     };
@@ -191,9 +215,12 @@ class LevelGenerator{
     }
 }
 
-const GEN = new LevelGenerator(null, 0, 0, GAME_NUM_ROWS, GAME_NUM_COLS);
+
+//const WORLD = [];
+//const GEN = new LevelGenerator(WORLD, WORLD_ROWS, WORLD_COLS, 0, 0, GAME_NUM_ROWS, GAME_NUM_COLS);
+const PIECES = WORLD[0].pieces;
 //const PIECES = GEN.pieces;
-const PIECES = [{"typ":"token","row":9,"col":15},{"typ":"token","row":15,"col":4},{"typ":"trap","row":0,"col":0},{"typ":"trap","row":0,"col":15},{"typ":"trap","row":1,"col":0},{"typ":"trap","row":1,"col":15},{"typ":"trap","row":2,"col":0},{"typ":"trap","row":2,"col":15},{"typ":"trap","row":3,"col":0},{"typ":"trap","row":3,"col":15},{"typ":"trap","row":4,"col":0},{"typ":"trap","row":4,"col":15},{"typ":"trap","row":5,"col":0},{"typ":"trap","row":5,"col":15},{"typ":"trap","row":6,"col":0},{"typ":"trap","row":6,"col":15},{"typ":"trap","row":7,"col":0},{"typ":"trap","row":7,"col":15},{"typ":"trap","row":8,"col":0},{"typ":"trap","row":8,"col":15},{"typ":"trap","row":9,"col":0},{"typ":"trap","row":10,"col":0},{"typ":"trap","row":10,"col":15},{"typ":"trap","row":11,"col":0},{"typ":"trap","row":11,"col":15},{"typ":"trap","row":12,"col":0},{"typ":"trap","row":12,"col":15},{"typ":"trap","row":13,"col":0},{"typ":"trap","row":13,"col":15},{"typ":"trap","row":14,"col":0},{"typ":"trap","row":14,"col":15},{"typ":"trap","row":15,"col":0},{"typ":"trap","row":15,"col":15},{"typ":"trap","row":0,"col":1},{"typ":"trap","row":15,"col":1},{"typ":"trap","row":0,"col":2},{"typ":"trap","row":15,"col":2},{"typ":"trap","row":0,"col":3},{"typ":"trap","row":15,"col":3},{"typ":"trap","row":0,"col":4},{"typ":"trap","row":0,"col":5},{"typ":"trap","row":15,"col":5},{"typ":"trap","row":0,"col":6},{"typ":"trap","row":15,"col":6},{"typ":"trap","row":0,"col":7},{"typ":"trap","row":15,"col":7},{"typ":"trap","row":0,"col":8},{"typ":"trap","row":15,"col":8},{"typ":"trap","row":0,"col":9},{"typ":"trap","row":15,"col":9},{"typ":"trap","row":0,"col":10},{"typ":"trap","row":15,"col":10},{"typ":"trap","row":0,"col":11},{"typ":"trap","row":15,"col":11},{"typ":"trap","row":0,"col":12},{"typ":"trap","row":15,"col":12},{"typ":"trap","row":0,"col":13},{"typ":"trap","row":15,"col":13},{"typ":"trap","row":0,"col":14},{"typ":"trap","row":15,"col":14},{"typ":"spawn","row":8,"col":8}];
+//const PIECES = [{"typ":"token","row":9,"col":15},{"typ":"token","row":15,"col":4},{"typ":"trap","row":0,"col":0},{"typ":"trap","row":0,"col":15},{"typ":"trap","row":1,"col":0},{"typ":"trap","row":1,"col":15},{"typ":"trap","row":2,"col":0},{"typ":"trap","row":2,"col":15},{"typ":"trap","row":3,"col":0},{"typ":"trap","row":3,"col":15},{"typ":"trap","row":4,"col":0},{"typ":"trap","row":4,"col":15},{"typ":"trap","row":5,"col":0},{"typ":"trap","row":5,"col":15},{"typ":"trap","row":6,"col":0},{"typ":"trap","row":6,"col":15},{"typ":"trap","row":7,"col":0},{"typ":"trap","row":7,"col":15},{"typ":"trap","row":8,"col":0},{"typ":"trap","row":8,"col":15},{"typ":"trap","row":9,"col":0},{"typ":"trap","row":10,"col":0},{"typ":"trap","row":10,"col":15},{"typ":"trap","row":11,"col":0},{"typ":"trap","row":11,"col":15},{"typ":"trap","row":12,"col":0},{"typ":"trap","row":12,"col":15},{"typ":"trap","row":13,"col":0},{"typ":"trap","row":13,"col":15},{"typ":"trap","row":14,"col":0},{"typ":"trap","row":14,"col":15},{"typ":"trap","row":15,"col":0},{"typ":"trap","row":15,"col":15},{"typ":"trap","row":0,"col":1},{"typ":"trap","row":15,"col":1},{"typ":"trap","row":0,"col":2},{"typ":"trap","row":15,"col":2},{"typ":"trap","row":0,"col":3},{"typ":"trap","row":15,"col":3},{"typ":"trap","row":0,"col":4},{"typ":"trap","row":0,"col":5},{"typ":"trap","row":15,"col":5},{"typ":"trap","row":0,"col":6},{"typ":"trap","row":15,"col":6},{"typ":"trap","row":0,"col":7},{"typ":"trap","row":15,"col":7},{"typ":"trap","row":0,"col":8},{"typ":"trap","row":15,"col":8},{"typ":"trap","row":0,"col":9},{"typ":"trap","row":15,"col":9},{"typ":"trap","row":0,"col":10},{"typ":"trap","row":15,"col":10},{"typ":"trap","row":0,"col":11},{"typ":"trap","row":15,"col":11},{"typ":"trap","row":0,"col":12},{"typ":"trap","row":15,"col":12},{"typ":"trap","row":0,"col":13},{"typ":"trap","row":15,"col":13},{"typ":"trap","row":0,"col":14},{"typ":"trap","row":15,"col":14},{"typ":"spawn","row":8,"col":8}];
 
 class Game {
     constructor(numRows, numCols, pieces) {
