@@ -265,7 +265,8 @@ class Game {
         this.numCols = numCols;
         this.matrix = new Array(this.numRows);
         this.ball = null;
-        this.momentum;
+        this.begun = false;
+        this.momentum = null;
 
         for (let row = 0; row < this.numRows; row++) {
             this.matrix[row] = new Array(this.numRows);
@@ -339,6 +340,7 @@ class Game {
         const beforePiece = this.matrix[this.ball.row][this.ball.col];
 
         if (beforePiece && beforePiece.typ === "trap") {
+            this.momentum = null;
             return { trapped: beforePiece};
         }
 
