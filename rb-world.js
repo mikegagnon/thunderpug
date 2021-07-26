@@ -139,15 +139,16 @@ class Game {
                 col: piece.col,
             }
             this.ball = ballPiece;
+            this.spawnPiece = piece;
         }
-        //let cell = [];
         if (this.matrix[piece.row][piece.col] === undefined) {
-            //cell = this.matrix[piece.row][piece.col];
             this.matrix[piece.row][piece.col] = piece;
         }
-        //cell.push(piece);
-        //this.matrix[piece.row][piece.col] = cell;
+    }
 
+    respawn() {
+        this.ball.row = this.spawnPiece.row;
+        this.ball.col = this.spawnPiece.col;
     }
 
     /*cellContainsTyp(cell, typ) {
@@ -611,6 +612,19 @@ class Viz {
         movement.trapped.animation.on("animationend",controllerCallback);
         movement.trapped.animation.gotoAndPlay("shut");
     }
+
+    respawn(controllerCallback) {
+        /*const movement = {
+            newRow: this.game.spawnPiece.row,
+            newCol: this.game.spawnPiece.col,
+        }
+        this.drawBallMove(movement);*/
+        const destX = this.game.spawnPiece.row * BLOCK_SIZE;
+        const destY = this.game.spawnPiece.col * BLOCK_SIZE;
+        this.ballAnimation.x = destX;
+        this.ballAnimation.y = destY;
+        controllerCallback();
+    }
 }
 
 class Controller {
@@ -846,7 +860,9 @@ class Controller {
             this.viz.drawTrapShut(movement, function(){
                 console.log(2);
                 THIS.game.respawn();
-                THIS.viz.respawn();
+                THIS.viz.respawn(function(){
+                    THIS.enableMove();
+                });
             });
         } else if (movement) {
             const THIS = this;
