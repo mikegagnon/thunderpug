@@ -125,6 +125,8 @@ class LevelGenerator {
         this.buildSpawn();
 
         this.insertIntoWorld();
+        console.log(JSON.stringify(this.world));
+
         //this.lev = JSON.stringify(this.stage);
     }
 
@@ -137,7 +139,6 @@ class LevelGenerator {
         }
 
         this.world.push(this.stage);
-        console.log(JSON.stringify(this.world));
     }
 
     logWorld() {
@@ -155,8 +156,8 @@ class LevelGenerator {
             throw new Error("unimplemented");
         }
 
-        const ROW_JITTER_SPAN = Math.floor(this.numRows / 2);
-        const COL_JITTER_SPAN = Math.floor(this.numCols / 2);
+        const ROW_JITTER_SPAN = 0;//Math.floor(this.numRows / 2);
+        const COL_JITTER_SPAN = 0;//Math.floor(this.numCols / 2);
         /*const z = new Set();
         for (let i = 0; i < 1000; i++) {
             const exitRow = Math.floor((Math.floor(Math.random() * ROW_JITTER_SPAN) - Math.floor(ROW_JITTER_SPAN / 2)) + Math.floor(this.numRows / 2));
