@@ -563,11 +563,55 @@ class Viz {
             images: [this.queue.getResult("token")],
             frames: {width:16, height:16},
             animations: {
-                color:[0,11,"color1"],
-                color1:[0,11,"color2"],
-                color2:[0,11,"color3"],
-                color3:[0,11,"color4"],
-                color4:[0,15,"color"],
+                color0a:[0,11,"color1a"],
+                color0b:[1,11,"color1a"],
+                color0c:[2,11,"color1a"],
+                color0d:[3,11,"color1a"],
+                color0e:[4,11,"color1a"],
+                color0f:[5,11,"color1a"],
+                color0g:[6,11,"color1a"],
+                color0h:[7,11,"color1a"],
+                color0i:[8,11,"color1a"],
+                color0j:[9,11,"color1a"],
+                color0k:[10,11,"color1a"],
+
+                color1a:[0,11,"color2a"],
+                color1b:[1,11,"color2a"],
+                color1c:[2,11,"color2a"],
+                color1d:[3,11,"color2a"],
+                color1e:[4,11,"color2a"],
+                color1f:[5,11,"color2a"],
+                color1g:[6,11,"color2a"],
+                color1h:[7,11,"color2a"],
+                color1i:[8,11,"color2a"],
+                color1j:[9,11,"color2a"],
+                color1k:[10,11,"color2a"],
+                
+                color2a:[0,11,"color3a"],
+                color2b:[1,11,"color3a"],
+                color2c:[2,11,"color3a"],
+                color2d:[3,11,"color3a"],
+                color2e:[4,11,"color3a"],
+                color2f:[5,11,"color3a"],
+                color2g:[6,11,"color3a"],
+                color2h:[7,11,"color3a"],
+                color2i:[8,11,"color3a"],
+                color2j:[9,11,"color3a"],
+                color2k:[10,11,"color3a"],
+
+                color3a:[0,11,"color4a"],
+                color3b:[1,11,"color4a"],
+                color3c:[2,11,"color4a"],
+                color3d:[3,11,"color4a"],
+                color3e:[4,11,"color4a"],
+                color3f:[5,11,"color4a"],
+                color3g:[6,11,"color4a"],
+                color3h:[7,11,"color4a"],
+                color3i:[8,11,"color4a"],
+                color3j:[9,11,"color4a"],
+                color3k:[10,11,"color3a"],
+
+                color4a:[0,15,"color0a"],
             }
         };
         const tokenSpriteSheet = new createjs.SpriteSheet(tokenSheetData);
@@ -577,7 +621,14 @@ class Viz {
             sheet: tokenSpriteSheet,
             init: function(animation) {
                 //animation.gotoAndPlay("shut");
-                animation.gotoAndPlay("color");
+                //animation.gotoAndPlay("color");
+
+                const n = Math.floor(Math.random() * 4);
+                const letters = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k"];
+                const l = letters[Math.floor(Math.random()*letters.length)];
+                const name = "color" + n + l;
+                animation.gotoAndPlay(name);
+
                 animation.framerate = 20;
             },
         };
