@@ -772,13 +772,18 @@ class Viz {
         const ballSheetData = {
             images: [this.queue.getResult("ball")],
             frames: {width:16, height:16},
+            animations: {
+                color:[0,5,"color"],
+            },
         };
         const ballSpriteSheet = new createjs.SpriteSheet(ballSheetData);
-
+        ballSpriteSheet.framerate = 15
 
         this.queueResult["ball"] = {
             sheet: ballSpriteSheet,
-            init: function(){}
+            init: function(animation){
+                animation.gotoAndPlay(0);
+            }
         }
     }
 
