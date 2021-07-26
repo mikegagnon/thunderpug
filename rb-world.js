@@ -25,7 +25,7 @@ const BLOCK_TYPES = [
 
 
 const GAME_NUM_ROWS = 16;// * 7;
-const GAME_NUM_COLS = 16;// * 7;
+const GAME_NUM_COLS = 32;// * 7;
 const NUM_BLOCKS = 5//000;
 //const NUM_BLOCKS = 5;
 
@@ -619,8 +619,8 @@ class Viz {
             newCol: this.game.spawnPiece.col,
         }
         this.drawBallMove(movement);*/
-        const destX = this.game.spawnPiece.row * BLOCK_SIZE;
-        const destY = this.game.spawnPiece.col * BLOCK_SIZE;
+        const destX = this.game.spawnPiece.col * BLOCK_SIZE;
+        const destY = this.game.spawnPiece.row * BLOCK_SIZE;
         this.ballAnimation.x = destX;
         this.ballAnimation.y = destY;
         controllerCallback();
