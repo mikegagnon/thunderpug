@@ -25,7 +25,7 @@ const BLOCK_TYPES = [
 
 
 const GAME_NUM_ROWS = 16;// * 7;
-const GAME_NUM_COLS = 32;// * 7;
+const GAME_NUM_COLS = 16;// * 7;
 const NUM_BLOCKS = 5//000;
 //const NUM_BLOCKS = 5;
 
@@ -39,7 +39,9 @@ const NUM_BLOCKS = 5//000;
     "trap-ceil"
 ];*/
 
-const PIECES = [
+//const WORLD = [];
+
+/*const PIECES = [
     {
         typ: "spawn",
         row: Math.floor(GAME_NUM_ROWS / 2),
@@ -75,7 +77,7 @@ const PIECES = [
         row: 2,
         col: 2,
     }
-];
+];*/
 
 //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
 function getRandomInt(min, max) {
@@ -84,7 +86,7 @@ function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min) + min); //The maximum is exclusive and the minimum is inclusive
 }
 
-for (let i = 0; i < NUM_BLOCKS; i++) {
+/*for (let i = 0; i < NUM_BLOCKS; i++) {
     const piece = {
         typ: "block",
         row: getRandomInt(0, GAME_NUM_ROWS),
@@ -94,7 +96,59 @@ for (let i = 0; i < NUM_BLOCKS; i++) {
     //if (piece.row)
 
     PIECES.push(piece);
+}*/
+
+class LevelGenerator{
+
+    constructor(stageRow, stageCol, numRows, numCols) {
+        this.stageRow = stageRow;
+        this.stageCol = stageCol;
+        this.numRows = numRows;
+        this.numCols = numCols;
+        this.pieces = [];
+        this.buildBorder();
+        this.buildSpawn();
+    }
+
+    buildSpawn() {
+        this.pieces.push({
+            typ: "spawn",
+            row: Math.floor(this.numRows / 2),
+            col: Math.floor(this.numCols / 2),
+        })
+    }
+
+    buildBorder() {
+        for (let r = 0; r < this.numRows; r++) {
+            this.pieces.push({
+                typ: "trap",
+                row: r,
+                col: 0,
+            });
+            this.pieces.push({
+                typ: "trap",
+                row: r,
+                col: this.numCols - 1,
+            });
+        }
+
+        for (let c = 1; c < this.numCols - 1; c++) {
+            this.pieces.push({
+                typ: "trap",
+                row: 0,
+                col: c,
+            });
+            this.pieces.push({
+                typ: "trap",
+                row: this.numRows - 1,
+                col: c,
+            });
+        }
+    }
 }
+
+const GEN = new LevelGenerator(0, 0, GAME_NUM_ROWS, GAME_NUM_COLS);
+const PIECES = GEN.pieces;
 
 class Game {
     constructor(numRows, numCols, pieces) {
