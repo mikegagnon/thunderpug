@@ -235,7 +235,26 @@ class LevelGenerator {
 
 //const WORLD = [];
 //const GEN = new LevelGenerator(WORLD, WORLD_ROWS, WORLD_COLS, 0, 1, GAME_NUM_ROWS, GAME_NUM_COLS);
-const PIECES = WORLD[1].pieces;
+
+function compileWorld(world) {
+    const pieces = [];
+    for (let i = 0; i < world.length; i++) {
+        const stage = world[i];
+        const wr = stage.worldRow;
+        const wc = stage.worldCol;
+        const wp = stage.pieces;
+        for (let j = 0; j < wp.length; j++) {
+            const piece = wp[j];
+            piece.row += (GAME_NUM_ROWS - 1) * wr;
+            piece.col += (GAME_NUM_ROWS - 1) * wc;
+            pieces.push(piece);
+        }
+    }
+    return pieces;
+}
+
+const PIECES = compileWorld(WORLD);
+//const PIECES = WORLD[1].pieces;
 //const PIECES = GEN.pieces;
 //const PIECES = [{"typ":"token","row":9,"col":15},{"typ":"token","row":15,"col":4},{"typ":"trap","row":0,"col":0},{"typ":"trap","row":0,"col":15},{"typ":"trap","row":1,"col":0},{"typ":"trap","row":1,"col":15},{"typ":"trap","row":2,"col":0},{"typ":"trap","row":2,"col":15},{"typ":"trap","row":3,"col":0},{"typ":"trap","row":3,"col":15},{"typ":"trap","row":4,"col":0},{"typ":"trap","row":4,"col":15},{"typ":"trap","row":5,"col":0},{"typ":"trap","row":5,"col":15},{"typ":"trap","row":6,"col":0},{"typ":"trap","row":6,"col":15},{"typ":"trap","row":7,"col":0},{"typ":"trap","row":7,"col":15},{"typ":"trap","row":8,"col":0},{"typ":"trap","row":8,"col":15},{"typ":"trap","row":9,"col":0},{"typ":"trap","row":10,"col":0},{"typ":"trap","row":10,"col":15},{"typ":"trap","row":11,"col":0},{"typ":"trap","row":11,"col":15},{"typ":"trap","row":12,"col":0},{"typ":"trap","row":12,"col":15},{"typ":"trap","row":13,"col":0},{"typ":"trap","row":13,"col":15},{"typ":"trap","row":14,"col":0},{"typ":"trap","row":14,"col":15},{"typ":"trap","row":15,"col":0},{"typ":"trap","row":15,"col":15},{"typ":"trap","row":0,"col":1},{"typ":"trap","row":15,"col":1},{"typ":"trap","row":0,"col":2},{"typ":"trap","row":15,"col":2},{"typ":"trap","row":0,"col":3},{"typ":"trap","row":15,"col":3},{"typ":"trap","row":0,"col":4},{"typ":"trap","row":0,"col":5},{"typ":"trap","row":15,"col":5},{"typ":"trap","row":0,"col":6},{"typ":"trap","row":15,"col":6},{"typ":"trap","row":0,"col":7},{"typ":"trap","row":15,"col":7},{"typ":"trap","row":0,"col":8},{"typ":"trap","row":15,"col":8},{"typ":"trap","row":0,"col":9},{"typ":"trap","row":15,"col":9},{"typ":"trap","row":0,"col":10},{"typ":"trap","row":15,"col":10},{"typ":"trap","row":0,"col":11},{"typ":"trap","row":15,"col":11},{"typ":"trap","row":0,"col":12},{"typ":"trap","row":15,"col":12},{"typ":"trap","row":0,"col":13},{"typ":"trap","row":15,"col":13},{"typ":"trap","row":0,"col":14},{"typ":"trap","row":15,"col":14},{"typ":"spawn","row":8,"col":8}];
 
@@ -246,7 +265,7 @@ class Game {
         this.numCols = numCols;
         this.matrix = new Array(this.numRows);
         this.ball = null;
-        this.momentum = {};
+        this.momentum;
 
         for (let row = 0; row < this.numRows; row++) {
             this.matrix[row] = new Array(this.numRows);
@@ -322,6 +341,13 @@ class Game {
         if (beforePiece && beforePiece.typ === "trap") {
             return { trapped: beforePiece};
         }
+
+        if (beforePiece && beforePiece.typ === "spawn" && this.momentum) {
+            this.momentum = null;
+            return null;
+        }
+
+        
 
 
         const newRow = this.ball.row + deltaRow;
@@ -1089,7 +1115,7 @@ function initRbWorld() {
     ]);
     function handleComplete() {
         if (MODE == "play") {
-            GAME = new Game(GAME_NUM_ROWS, GAME_NUM_COLS, PIECES);
+            GAME = new Game(GAME_NUM_ROWS, GAME_NUM_COLS * 2 - 1, PIECES);
             VIZ = new Viz(queue, GAME, "rb-world-canvas", START_SCALE, MODE);
             CONTROLLER = new Controller(GAME, VIZ);
         } else {
