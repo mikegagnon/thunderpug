@@ -1,5 +1,5 @@
 const FPS = 60;
-const START_SCALE = 1.5;
+const START_SCALE = 2;
 const ZOOM_SLIDER_WIDTH = 40;
 // num millis for the ball to move one square
 const BALL_MOVE_INTERVAL = 50;
@@ -11,7 +11,7 @@ const ARROW_BUTTON_HORZ_WIDTH = ARROW_BUTTON_VERT_HEIGHT;
 
 const MAX_ZOOM = 8;
 const MIN_ZOOM = 0.01;
-const BLOCK_SIZE = 16;
+const BLOCK_SIZE = 15;
 
 const BLOCK_TYPES = [
     "spawn",
@@ -26,7 +26,7 @@ const BLOCK_TYPES = [
 
 const GAME_NUM_ROWS = 16;// * 7;
 const GAME_NUM_COLS = 16;// * 7;
-const NUM_BLOCKS = 5//000;
+const NUM_BLOCKS = 50//000;
 //const NUM_BLOCKS = 5;
 
 //const GAME_NUM_ROWS = 5;
@@ -319,7 +319,7 @@ class Viz {
         this.stage = new createjs.StageGL(this.canvasId);
         createjs.Touch.enable(this.stage);
         this.stage.updateViewport(this.canvas.width, this.canvas.height);
-        this.stage.setClearColor("#000");
+        this.stage.setClearColor("#111");
 
         this.container = new createjs.Container();
         this.container.x = 0;
@@ -329,7 +329,7 @@ class Viz {
 
         // Draw background color
         const g = new createjs.Shape();
-        g.graphics.beginFill("#000").drawRect(0, 0, this.game.numCols * BLOCK_SIZE, this.game.numRows * BLOCK_SIZE);
+        g.graphics.beginFill("#eee").drawRect(0, 0, this.game.numCols * BLOCK_SIZE, this.game.numRows * BLOCK_SIZE);
         this.container.addChild(g);
         g.cache(0, 0, this.game.numCols * BLOCK_SIZE, this.game.numRows * BLOCK_SIZE);
 
@@ -467,7 +467,11 @@ class Viz {
             images: [this.queue.getResult("token")],
             frames: {width:16, height:16},
             animations: {
-                color:[0,15,"color"],
+                color:[0,11,"color1"],
+                color1:[0,11,"color2"],
+                color2:[0,11,"color3"],
+                color3:[0,11,"color4"],
+                color4:[0,15,"color"],
             }
         };
         const tokenSpriteSheet = new createjs.SpriteSheet(tokenSheetData);
@@ -571,14 +575,14 @@ class Viz {
     }
 
     drawHorzGridLine(rowIndex, line) {
-        line.graphics.setStrokeStyle(1).beginStroke("#00a");
+        line.graphics.setStrokeStyle(0.5).beginStroke("#88f");
         line.graphics.moveTo(0, rowIndex * BLOCK_SIZE);
         line.graphics.lineTo(this.game.numCols * BLOCK_SIZE, rowIndex * BLOCK_SIZE);
         line.graphics.endStroke();
     }
 
     drawVertGridLine(colIndex, line) {
-        line.graphics.setStrokeStyle(1).beginStroke("#00a");
+        line.graphics.setStrokeStyle(0.5).beginStroke("#88f");
         line.graphics.moveTo(colIndex * BLOCK_SIZE, 0);
         line.graphics.lineTo(colIndex * BLOCK_SIZE, this.game.numRows * BLOCK_SIZE);
         line.graphics.endStroke();
