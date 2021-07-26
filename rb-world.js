@@ -46,11 +46,6 @@ const PIECES = [
         col: Math.floor(GAME_NUM_COLS / 2),
     },
     {
-        typ: "ball",
-        row: Math.floor(GAME_NUM_ROWS / 2),
-        col: Math.floor(GAME_NUM_COLS / 2),
-    },
-    {
         typ: "trap",
         row: 0,
         col: 0,
@@ -137,9 +132,13 @@ class Game {
     }
 
     addPiece(piece) {
-        if (piece.typ === "ball") {
-            this.ball = piece;
-            return;
+        if (piece.typ === "spawn") {
+            const ballPiece = {
+                typ: "ball",
+                row: piece.row,
+                col: piece.col,
+            }
+            this.ball = ballPiece;
         }
         //let cell = [];
         if (this.matrix[piece.row][piece.col] === undefined) {
