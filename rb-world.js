@@ -396,7 +396,7 @@ class Camera {
     constructor(viz, game, scale) {
         this.viz = viz;
         this.game = game;
-        this.trackingBall = true;
+        this.trackingBall = false;
         
 
         // The coordinates for the center of the *container* (not the stage)
@@ -819,8 +819,9 @@ class Viz {
         if (this.camera.trackingBall) {
             this.camera.centerBall();
             this.camera.placeCamera();
-            this.stage.update(event);
         }
+        this.stage.update(event);
+
     }
 
     drawBallMove(movement, controllerCallback) {
