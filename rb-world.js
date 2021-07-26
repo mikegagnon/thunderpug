@@ -100,27 +100,77 @@ function getRandomInt(min, max) {
 
 class LevelGenerator{
 
-    constructor(stageRow, stageCol, numRows, numCols) {
+    constructor(world, stageRow, stageCol, numRows, numCols) {
+        this.world = world;
         this.stageRow = stageRow;
         this.stageCol = stageCol;
         this.numRows = numRows;
         this.numCols = numCols;
+
         this.pieces = [];
+        this.matrix = new Array(this.numRows);
+        for (let row = 0; row < this.numRows; row++) {
+            this.matrix[row] = new Array(this.numRows);
+        }
+
+        this.buildExits();
         this.buildBorder();
         this.buildSpawn();
     }
 
-    buildSpawn() {
-        this.pieces.push({
-            typ: "spawn",
-            row: Math.floor(this.numRows / 2),
-            col: Math.floor(this.numCols / 2),
-        })
+    // TODO: bottom-most and right-most stages should not have exits
+    buildExits() {
+        if (this.stageRow > 0) {
+            // build top exit based on stage from above
+            throw new Error("unimplemented");
+        }
+        if (this.stageCol > 0) {
+            // build left exit based on stage from left
+            throw new Error("unimplemented");
+        }
+
+        const ROW_JITTER_SPAN = Math.floor(this.numRows / 2);
+        const COL_JITTER_SPAN = Math.floor(this.numCols / 2);
+        /*const z = new Set();
+        for (let i = 0; i < 1000; i++) {
+            const exitRow = Math.floor((Math.floor(Math.random() * ROW_JITTER_SPAN) - Math.floor(ROW_JITTER_SPAN / 2)) + Math.floor(this.numRows / 2));
+            z.add(exitRow);
+        }
+        console.log(z);*/
+
+        const exitRow = Math.floor((Math.floor(Math.random() * ROW_JITTER_SPAN) - Math.floor(ROW_JITTER_SPAN / 2)) + Math.floor(this.numRows / 2));        
+        this.maybeAddPiece("token", exitRow, this.numCols - 1);
+
+        const exitCol = Math.floor((Math.floor(Math.random() * COL_JITTER_SPAN) - Math.floor(COL_JITTER_SPAN / 2)) + Math.floor(this.numCols / 2));
+        this.maybeAddPiece("token", this.numRows - 1, exitCol);
+
+
     }
+
+    buildSpawn() {
+        this.maybeAddPiece("spawn", Math.floor(this.numRows / 2),  Math.floor(this.numCols / 2));
+    }
+
+    maybeAddPiece(typ, row, col) {
+        if (this.matrix[row][col]) {
+            return false;
+        } else {
+            const piece = {
+                typ: typ,
+                row: row,
+                col: col,
+            }
+            this.pieces.push(piece);
+            this.matrix[row][col] = piece;
+        }
+    };
 
     buildBorder() {
         for (let r = 0; r < this.numRows; r++) {
-            this.pieces.push({
+            this.maybeAddPiece("trap", r, 0);
+            this.maybeAddPiece("trap", r, this.numCols - 1);
+
+            /*this.pieces.push({
                 typ: "trap",
                 row: r,
                 col: 0,
@@ -129,25 +179,17 @@ class LevelGenerator{
                 typ: "trap",
                 row: r,
                 col: this.numCols - 1,
-            });
+            });*/
         }
 
         for (let c = 1; c < this.numCols - 1; c++) {
-            this.pieces.push({
-                typ: "trap",
-                row: 0,
-                col: c,
-            });
-            this.pieces.push({
-                typ: "trap",
-                row: this.numRows - 1,
-                col: c,
-            });
+            this.maybeAddPiece("trap", 0, c);
+            this.maybeAddPiece("trap", this.numRows - 1, c);
         }
     }
 }
 
-const GEN = new LevelGenerator(0, 0, GAME_NUM_ROWS, GAME_NUM_COLS);
+const GEN = new LevelGenerator(null, 0, 0, GAME_NUM_ROWS, GAME_NUM_COLS);
 const PIECES = GEN.pieces;
 
 class Game {
