@@ -1,3 +1,9 @@
+//const MODE = "play";
+const MODE = "dev";
+const GEN_STAGE_ROW = 0;
+const GEN_STAGE_COL = 0;
+
+
 const FPS = 60;
 const START_SCALE = 2;
 const ZOOM_SLIDER_WIDTH = 40;
@@ -91,15 +97,20 @@ function getRandomInt(min, max) {
 }
 
 
+/*class LevelGenerator {
+    constructor(world, worldNumRows, worldNumCols, worldStartRow, worldStartCol, stageNumRows, stageNumCols) {
+    }
+}*/
 
-class LevelGenerator {
+
+class LevelGeneratorOld {
 
     constructor(world, numWorldRows, numWorldCols, worldRow, worldCol, stageNumRows, stageNumCols) {
         this.world = world;
         this.numWorldRows = numWorldRows;
         this.numWorldCols = numWorldCols;
-        //this.worldRow = worldRow;
-        //this.worldCol = worldCol;
+        this.worldRow = worldRow;
+        this.worldCol = worldCol;
         this.stageNumRows = stageNumRows;
         this.stageNumCols = stageNumCols;
 
@@ -116,6 +127,7 @@ class LevelGenerator {
             this.matrix[row] = new Array(this.numRows);
         }
 
+        this.clearThisStage();
         this.buildExits();
         this.buildBorder();
         this.buildSpawn();
@@ -125,6 +137,11 @@ class LevelGenerator {
 
         //this.lev = JSON.stringify(this.stage);
     }
+
+    clearThisStage() {
+
+    }
+
 
     insertIntoWorld() {
         for (let i = 0; i < this.world.length; i++) {
@@ -263,12 +280,12 @@ class Game {
         this.currentWorldCol = worldStartCol;
 
         this.pieces = this.compileWorld(this.world);
-        this.randomBlocks();
+        //this.randomBlocks();
 
         this.stageNumRows = stageNumRows;
         this.stageNumCols = stageNumCols;
 
-        this.numRows = this.stageNumRows;
+        this.numRows = this.stageNumRows * 2 - 1;
         this.numCols = this.stageNumCols * 2 - 1;
 
         this.matrix = new Array(this.numRows);
@@ -1297,7 +1314,7 @@ let GAME;
 let VIZ;
 let CONTROLLER;
 
-
+let GEN;
 
 function initRbWorld() {
     const queue = new createjs.LoadQueue();
@@ -1316,10 +1333,13 @@ function initRbWorld() {
             GAME = new Game(WORLD, WORLD_ROWS, WORLD_COLS, WORLD_START_ROW, WORLD_START_COL, GAME_NUM_ROWS, GAME_NUM_COLS);
             VIZ = new Viz(queue, GAME, "rb-world-canvas", START_SCALE, MODE);
             CONTROLLER = new Controller(GAME, VIZ);
-        } /*else {
-            GAME = new Game(GAME_NUM_ROWS, GAME_NUM_COLS, PIECES);
+        } else {
+
+            //GEN = new LevelGenerator(WORLD, WORLD_ROWS, WORLD_COLS, GEN_STAGE_ROW, GEN_STAGE_COL, GAME_NUM_ROWS, GAME_NUM_COLS);
+            //WORLD = GEN.getWorld();
+            GAME = new Game(WORLD, WORLD_ROWS, WORLD_COLS, WORLD_START_ROW, WORLD_START_COL, GAME_NUM_ROWS, GAME_NUM_COLS);
             VIZ = new Viz(queue, GAME, "rb-world-canvas", START_SCALE, MODE);
             CONTROLLER = new Controller(GAME, VIZ);
-        }*/
+        }
     }
 }
