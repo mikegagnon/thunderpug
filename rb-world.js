@@ -3,7 +3,7 @@ const START_SCALE = 2;
 const ZOOM_SLIDER_WIDTH = 40;
 // num millis for the ball to move one square
 const BALL_MOVE_INTERVAL = 50;
-const STAGE_TWEEN_TICKS = 50;
+const STAGE_TWEEN_TICKS = 30;
 
 const ARROW_BUTTON_VERT_HEIGHT = 100;
 const ARROW_BUTTON_VERT_WIDTH = 25;
@@ -1160,6 +1160,7 @@ class Controller {
 
     // TODO: this belongs in viz.camera
     beginStageTween(from, to) {
+        //this.disableMove();
         //const deltaWorldRow = to.wr - from.wr;
         //const deltaWorldCol = to.wc - from.wc;
 
@@ -1179,6 +1180,7 @@ class Controller {
                 console.log("asdf")
                 THIS.game.currentWorldRow = to.wr;
                 THIS.game.currentWorldCol = to.wc;
+                //THIS.ena
             }
         };
 
@@ -1199,7 +1201,7 @@ class Controller {
     }
 
     up() {
-        if (!this.enabledMovement) {
+        if (!this.enabledMovement || this.viz.camera.stageTween) {
             return;
         }
         const from = {
@@ -1216,21 +1218,21 @@ class Controller {
     }
     
     down() {
-        if (!this.enabledMovement) {
+        if (!this.enabledMovement || this.viz.camera.stageTween) {
             return;
         }
         this.go(1, 0);
     }
     
     left() {
-        if (!this.enabledMovement) {
+        if (!this.enabledMovement || this.viz.camera.stageTween) {
             return;
         }
         this.go(0, -1);
     }
     
     right() {
-        if (!this.enabledMovement) {
+        if (!this.enabledMovement || this.viz.camera.stageTween) {
             return;
         }
         this.go(0, 1);
