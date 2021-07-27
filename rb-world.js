@@ -471,7 +471,8 @@ class Camera {
 
     // center stage (as in level), as opposed to stage (as in createjs stage)
     centerStage() {
-        const spawnX = this.game.dd
+        const stage = this.game.worldMatrix[this.game.currentWorldRow][this.game.currentWorldCol];
+        const spawnX = ddd
     }
 
     zoom(scale) {
