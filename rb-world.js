@@ -3,7 +3,7 @@ const MODE = "dev";
 const GEN_STAGE_ROW = 0;
 const GEN_STAGE_COL = 0;
 const WORLD_START_ROW = 1;
-const WORLD_START_COL = 0;
+const WORLD_START_COL = 1;
 
 const FPS = 60;
 const START_SCALE = 2;
@@ -132,6 +132,7 @@ class LevelGenerator {
 
         this.buildSpawn();
         this.buildExits();
+        this.buildBorder();
     }
 
     buildSpawn() {
@@ -204,6 +205,18 @@ class LevelGenerator {
         return undefined;
     }
 
+    buildBorder() {
+        for (let r = 0; r < this.stageNumRows; r++) {
+            this.maybeAddPiece("trap", r, 0);
+            this.maybeAddPiece("trap", r, this.stageNumCols - 1);
+        }
+
+        for (let c = 1; c < this.stageNumCols - 1; c++) {
+            this.maybeAddPiece("trap", 0, c);
+            this.maybeAddPiece("trap", this.stageNumRows - 1, c);
+        }
+    }
+
         // TODO: bottom-most and right-most stages should not have exits
     buildExits() {
         let leftExitRow = this.getExitNeighbor(0, -1);
@@ -211,7 +224,7 @@ class LevelGenerator {
         let topExitCol = this.getExitNeighbor(-1, 0);
         let bottomExitCol = this.getExitNeighbor(1, 0);
 
-        console.log(leftExitRow, rightExitRow, topExitCol, bottomExitCol);
+        //console.log(leftExitRow, rightExitRow, topExitCol, bottomExitCol);
 
 
         const ROW_JITTER_SPAN = Math.floor(this.stageNumRows / 2);
@@ -230,7 +243,7 @@ class LevelGenerator {
             bottomExitCol = Math.floor((Math.floor(Math.random() * COL_JITTER_SPAN) - Math.floor(COL_JITTER_SPAN / 2)) + Math.floor(this.stageNumCols / 2));
         }
 
-        console.log(leftExitRow, rightExitRow, topExitCol, bottomExitCol);
+        //console.log(leftExitRow, rightExitRow, topExitCol, bottomExitCol);
 
         if (leftExitRow) {
             this.maybeAddPiece("token", leftExitRow, 0);
