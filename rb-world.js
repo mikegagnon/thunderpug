@@ -249,10 +249,14 @@ for (let i = 0; i < NUM_BLOCKS; i++) {
 //const PIECES = [{"typ":"token","row":9,"col":15},{"typ":"token","row":15,"col":4},{"typ":"trap","row":0,"col":0},{"typ":"trap","row":0,"col":15},{"typ":"trap","row":1,"col":0},{"typ":"trap","row":1,"col":15},{"typ":"trap","row":2,"col":0},{"typ":"trap","row":2,"col":15},{"typ":"trap","row":3,"col":0},{"typ":"trap","row":3,"col":15},{"typ":"trap","row":4,"col":0},{"typ":"trap","row":4,"col":15},{"typ":"trap","row":5,"col":0},{"typ":"trap","row":5,"col":15},{"typ":"trap","row":6,"col":0},{"typ":"trap","row":6,"col":15},{"typ":"trap","row":7,"col":0},{"typ":"trap","row":7,"col":15},{"typ":"trap","row":8,"col":0},{"typ":"trap","row":8,"col":15},{"typ":"trap","row":9,"col":0},{"typ":"trap","row":10,"col":0},{"typ":"trap","row":10,"col":15},{"typ":"trap","row":11,"col":0},{"typ":"trap","row":11,"col":15},{"typ":"trap","row":12,"col":0},{"typ":"trap","row":12,"col":15},{"typ":"trap","row":13,"col":0},{"typ":"trap","row":13,"col":15},{"typ":"trap","row":14,"col":0},{"typ":"trap","row":14,"col":15},{"typ":"trap","row":15,"col":0},{"typ":"trap","row":15,"col":15},{"typ":"trap","row":0,"col":1},{"typ":"trap","row":15,"col":1},{"typ":"trap","row":0,"col":2},{"typ":"trap","row":15,"col":2},{"typ":"trap","row":0,"col":3},{"typ":"trap","row":15,"col":3},{"typ":"trap","row":0,"col":4},{"typ":"trap","row":0,"col":5},{"typ":"trap","row":15,"col":5},{"typ":"trap","row":0,"col":6},{"typ":"trap","row":15,"col":6},{"typ":"trap","row":0,"col":7},{"typ":"trap","row":15,"col":7},{"typ":"trap","row":0,"col":8},{"typ":"trap","row":15,"col":8},{"typ":"trap","row":0,"col":9},{"typ":"trap","row":15,"col":9},{"typ":"trap","row":0,"col":10},{"typ":"trap","row":15,"col":10},{"typ":"trap","row":0,"col":11},{"typ":"trap","row":15,"col":11},{"typ":"trap","row":0,"col":12},{"typ":"trap","row":15,"col":12},{"typ":"trap","row":0,"col":13},{"typ":"trap","row":15,"col":13},{"typ":"trap","row":0,"col":14},{"typ":"trap","row":15,"col":14},{"typ":"spawn","row":8,"col":8}];
 
 class Game {
-    constructor(world, worldStartRow, worldStartCol, numRows, numCols) {
+    constructor(world, worldNumRows, worldNumCols, worldStartRow, worldStartCol, numRows, numCols) {
         this.world = world;
+        this.worldNumRows = worldNumRows;
+        this.worldNumCols = worldNumCols;
         this.worldStartRow = worldStartRow;
         this.worldStartCol = worldStartCol;
+        this.currentWorldRow = worldStartRow;
+        this.currentWorldCol = worldStartCol;
 
         this.pieces = this.compileWorld(this.world);
         this.randomBlocks();
@@ -265,7 +269,7 @@ class Game {
         this.momentum = null;
 
         for (let row = 0; row < this.numRows; row++) {
-            this.matrix[row] = new Array(this.numRows);
+            this.matrix[row] = new Array(this.numCols);
             /*for (let col = 0; col < this.numCols; col++) {
                 this.matrix[row][col] = undefined;
             }*/
@@ -278,12 +282,21 @@ class Game {
     }
 
     compileWorld(world) {
+        this.worldMatrix = new Array(this.worldNumRows);
+        for (let r = 0; r < this.worldNumRows; r++) {
+            this.worldMatrix[r] = new Array(this.worldNumCols);
+            /*for (let col = 0; col < this.numCols; col++) {
+                this.matrix[row][col] = undefined;
+            }*/
+        }
+
         const pieces = [];
         for (let i = 0; i < world.length; i++) {
             const stage = world[i];
             const wr = stage.worldRow;
             const wc = stage.worldCol;
             const wp = stage.pieces;
+            this.worldMatrix[wr][wc] = stage;
             for (let j = 0; j < wp.length; j++) {
                 const piece = wp[j];
                 piece.row += (GAME_NUM_ROWS - 1) * wr;
@@ -429,6 +442,7 @@ class Camera {
         this.viz = viz;
         this.game = game;
         this.trackingBall = false;
+        this.trackingStage = true;
         
 
         // The coordinates for the center of the *container* (not the stage)
@@ -437,17 +451,27 @@ class Camera {
             y: 0,
         };
 
-        this.centerBall();
+        if (this.trackingBall) {
+
+            this.centerBall();
+        } else if (this.trackingStage) {
+            this.centerStage();
+        }
         this.placeCamera();
         this.zoom(scale);
     }
 
-    centerBall(ball) {
+    centerBall() {
         const ballX = this.viz.ballAnimation.x;
         const ballY = this.viz.ballAnimation.y;
         this.center.x = (ballX + BLOCK_SIZE / 2) * this.scale;
         this.center.y = (ballY + BLOCK_SIZE / 2) * this.scale;
-        console.log(this.center);
+        //console.log(this.center);
+    }
+
+    // center stage (as in level), as opposed to stage (as in createjs stage)
+    centerStage() {
+        const spawnX = this.game.dd
     }
 
     zoom(scale) {
@@ -1156,7 +1180,7 @@ function initRbWorld() {
     ]);
     function handleComplete() {
         if (MODE == "play") {
-            GAME = new Game(WORLD, WORLD_START_ROW, WORLD_START_COL, GAME_NUM_ROWS, GAME_NUM_COLS * 2 - 1);
+            GAME = new Game(WORLD, WORLD_ROWS, WORLD_COLS, WORLD_START_ROW, WORLD_START_COL, GAME_NUM_ROWS, GAME_NUM_COLS * 2 - 1);
             VIZ = new Viz(queue, GAME, "rb-world-canvas", START_SCALE, MODE);
             CONTROLLER = new Controller(GAME, VIZ);
         } /*else {
