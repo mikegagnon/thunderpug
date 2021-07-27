@@ -514,10 +514,8 @@ class Solver {
     }
 
     solveDir(r, c, deltaRow, deltaCol) {
-        console.log("asdfasdfsdf")
-        if (this.matrix[r][c].restingPoint) {
-            return "oldRestingPoint";
-        }
+        //console.log("asdfasdfsdf")
+        
 
         const departingFromPiece = this.game.matrix[r][c];
         if (departingFromPiece != undefined && departingFromPiece.typ != "spawn") {
@@ -536,7 +534,7 @@ class Solver {
 
         if (arrivedAtPiece === undefined) {
             return this.solveDir(newR, newC, deltaRow, deltaCol);
-        } else {
+        } else if (!this.matrix[r][c].restingPoint && arrivedAtPiece.typ == "block") {
             this.matrix[r][c].restingPoint = true;
             console.log("resting", r, c);
             this.solve(r, c);
