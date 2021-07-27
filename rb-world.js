@@ -24,7 +24,7 @@ const BLOCK_TYPES = [
 
 
 const WORLD_START_ROW = 0;
-const WORLD_START_COL = 1;
+const WORLD_START_COL = 0;
 const WORLD_ROWS = 7;
 const WORLD_COLS = 7;
 const GAME_NUM_ROWS = 16;// * 7;
