@@ -2,7 +2,8 @@
 const MODE = "dev";
 const GEN_STAGE_ROW = 0;
 const GEN_STAGE_COL = 0;
-
+const WORLD_START_ROW = 1;
+const WORLD_START_COL = 1;
 
 const FPS = 60;
 const START_SCALE = 2;
@@ -30,8 +31,7 @@ const BLOCK_TYPES = [
 
 
 
-const WORLD_START_ROW = 0;
-const WORLD_START_COL = 0;
+
 const WORLD_ROWS = 7;
 const WORLD_COLS = 7;
 const GAME_NUM_ROWS = 16;// * 7;
