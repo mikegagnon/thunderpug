@@ -2,8 +2,8 @@
 const MODE = "dev";
 const GEN_STAGE_ROW = 0;
 const GEN_STAGE_COL = 0;
-const WORLD_START_ROW = 0;
-const WORLD_START_COL = 1;
+const WORLD_START_ROW = 1;
+const WORLD_START_COL = 0;
 
 const FPS = 60;
 const START_SCALE = 2;
@@ -32,8 +32,8 @@ const BLOCK_TYPES = [
 
 
 
-const WORLD_ROWS = 7;
-const WORLD_COLS = 7;
+const WORLD_ROWS = 2;
+const WORLD_COLS = 2;
 const GAME_NUM_ROWS = 16;// * 7;
 const GAME_NUM_COLS = 16;// * 7;
 const NUM_BLOCKS = 5//000;
@@ -217,25 +217,33 @@ class LevelGenerator {
         const ROW_JITTER_SPAN = Math.floor(this.stageNumRows / 2);
         const COL_JITTER_SPAN = Math.floor(this.stageNumCols / 2);
 
-        if (leftExitRow === undefined) {
+        if (leftExitRow === undefined && this.stage.worldCol > 0) {
             leftExitRow = Math.floor((Math.floor(Math.random() * ROW_JITTER_SPAN) - Math.floor(ROW_JITTER_SPAN / 2)) + Math.floor(this.stageNumRows / 2));
         }
-        if (rightExitRow === undefined) {
+        if (rightExitRow === undefined && this.stage.worldCol < this.worldNumCols - 1) {
             rightExitRow = Math.floor((Math.floor(Math.random() * ROW_JITTER_SPAN) - Math.floor(ROW_JITTER_SPAN / 2)) + Math.floor(this.stageNumRows / 2));
         }
-        if (topExitCol === undefined) {
+        if (topExitCol === undefined && this.stage.worldRow > 0) {
             topExitCol = Math.floor((Math.floor(Math.random() * COL_JITTER_SPAN) - Math.floor(COL_JITTER_SPAN / 2)) + Math.floor(this.stageNumCols / 2));
         }
-        if (bottomExitCol === undefined) {
+        if (bottomExitCol === undefined && this.stage.worldRow < this.worldNumRows - 1) {
             bottomExitCol = Math.floor((Math.floor(Math.random() * COL_JITTER_SPAN) - Math.floor(COL_JITTER_SPAN / 2)) + Math.floor(this.stageNumCols / 2));
         }
 
         console.log(leftExitRow, rightExitRow, topExitCol, bottomExitCol);
 
-        this.maybeAddPiece("token", leftExitRow, 0);
-        this.maybeAddPiece("token", rightExitRow, this.stageNumCols - 1);
-        this.maybeAddPiece("token", 0, topExitCol);
-        this.maybeAddPiece("token", this.stageNumRows - 1, bottomExitCol);
+        if (leftExitRow) {
+            this.maybeAddPiece("token", leftExitRow, 0);
+        }
+        if (rightExitRow) {
+            this.maybeAddPiece("token", rightExitRow, this.stageNumCols - 1);
+        }
+        if (topExitCol) {
+            this.maybeAddPiece("token", 0, topExitCol);
+        }
+        if (bottomExitCol) {
+            this.maybeAddPiece("token", this.stageNumRows - 1, bottomExitCol);
+        }
 
 
 
@@ -424,8 +432,8 @@ class Game {
         this.stageNumRows = stageNumRows;
         this.stageNumCols = stageNumCols;
 
-        this.numRows = (this.stageNumRows - 1) * this.worldNumRows;
-        this.numCols = (this.stageNumCols - 1) * this.worldNumCols;
+        this.numRows = (this.stageNumRows - 1) * this.worldNumRows + 1;
+        this.numCols = (this.stageNumCols - 1) * this.worldNumCols + 1;
 
         this.matrix = new Array(this.numRows);
         this.ball = null;
