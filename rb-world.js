@@ -3,6 +3,7 @@ const START_SCALE = 2;
 const ZOOM_SLIDER_WIDTH = 40;
 // num millis for the ball to move one square
 const BALL_MOVE_INTERVAL = 50;
+const STAGE_TWEEN_TICKS = 50;
 
 const ARROW_BUTTON_VERT_HEIGHT = 100;
 const ARROW_BUTTON_VERT_WIDTH = 25;
@@ -450,6 +451,8 @@ class Camera {
         this.game = game;
         this.trackingBall = false;
         this.trackingStage = true;
+        this.stageTween = null;
+
         
 
         // The coordinates for the center of the *container* (not the stage)
@@ -476,16 +479,27 @@ class Camera {
         //console.log(this.center);
     }
 
+    getCenterStageXy(wr, wc) {
+        const x = ((wc * (this.game.stageNumCols - 1)) + ((this.game.stageNumCols - 0) / 2)) * BLOCK_SIZE * this.scale;
+        const y = ((wr * (this.game.stageNumRows - 1)) + ((this.game.stageNumRows - 0) / 2)) * BLOCK_SIZE * this.scale;
+        return {
+            x: x,
+            y: y
+        };
+        
+    }
+
     // center stage (as in level), as opposed to stage (as in createjs stage)
     centerStage() {
         //const stage = this.game.worldMatrix[this.game.currentWorldRow][this.game.currentWorldCol];
         //const centerStageX = stage.spawn.animation.x;
         //const centerStageY = stage.spawn.animation.y;
         //console.log(spawnX, spawnY)
-        const x = ((this.game.currentWorldCol * (this.game.stageNumCols - 1)) + ((this.game.stageNumCols - 0) / 2)) * BLOCK_SIZE;
-        const y = ((this.game.currentWorldRow * (this.game.stageNumRows - 1)) + ((this.game.stageNumRows - 0) / 2)) * BLOCK_SIZE;
-        this.center.x = x * this.scale;
-        this.center.y = y * this.scale;
+        //const x = ((this.game.currentWorldCol * (this.game.stageNumCols - 1)) + ((this.game.stageNumCols - 0) / 2)) * BLOCK_SIZE;
+        //const y = ((this.game.currentWorldRow * (this.game.stageNumRows - 1)) + ((this.game.stageNumRows - 0) / 2)) * BLOCK_SIZE;
+        const xy = this.getCenterStageXy(this.game.currentWorldRow, this.game.currentWorldCol);
+        this.center.x = xy.x;
+        this.center.y = xy.y;
     }
 
     zoom(scale) {
@@ -516,6 +530,22 @@ class Camera {
 
         //console.log("hello", this.center);
     }*/
+
+    centerStageTween() {
+        if (this.stageTween.numPastTicks >= STAGE_TWEEN_TICKS) {
+            this.stageTween.controllerCallback();
+            this.stageTween = null;
+        } else {
+            this.stageTween.numPastTicks += 1;
+            const p = this.stageTween.numPastTicks / STAGE_TWEEN_TICKS;
+            const deltaX = this.stageTween.toXy.x - this.stageTween.fromXy.x;
+            const deltaY = this.stageTween.toXy.y - this.stageTween.fromXy.y;
+            const newX = deltaX * p + this.stageTween.fromXy.x;
+            const newY = deltaY * p + this.stageTween.fromXy.y;
+            this.center.x = newX;
+            this.center.y = newY;
+        }
+    }
 
     placeCamera() {
         //console.log("placeCamera")
@@ -890,12 +920,14 @@ class Viz {
         if (this.camera.trackingBall) {
             this.camera.centerBall();
             this.camera.placeCamera();
+        } else if (this.camera.stageTween) {
+            this.camera.centerStageTween();
+            this.camera.placeCamera();
         } else if (this.camera.trackingStage) {
             this.camera.centerStage();
             this.camera.placeCamera();
-        }
+        } 
         this.stage.update(event);
-
     }
 
     drawBallMove(movement, controllerCallback) {
@@ -935,6 +967,7 @@ class Controller {
         this.viz = viz;
         this.enabledMovement = true;
         this.dragStart = null;
+
         //this.setupArrowButtons();
 
         // https://stackoverflow.com/questions/5597060/detecting-arrow-key-presses-in-javascript
@@ -1101,6 +1134,7 @@ class Controller {
 
     //https://developer.mozilla.org/en-US/docs/Web/API/Element/wheel_event
     zoom(event) {
+        // TODO: If stage tween then disable zoom
         event.preventDefault();
 
         let scale = this.viz.camera.scale;
@@ -1124,11 +1158,61 @@ class Controller {
         this.enabledMovement = true;
     }
 
+    // TODO: this belongs in viz.camera
+    beginStageTween(from, to) {
+        //const deltaWorldRow = to.wr - from.wr;
+        //const deltaWorldCol = to.wc - from.wc;
+
+        const fromXy = this.viz.camera.getCenterStageXy(from.wr, from.wc);
+        const toXy = this.viz.camera.getCenterStageXy(to.wr, to.wc);
+
+        console.log(fromXy, toXy);
+        const THIS = this;
+
+        this.viz.camera.trackingStage = false;
+        this.viz.camera.trackingBall = false;
+        this.viz.camera.stageTween = {
+            fromXy: fromXy,
+            toXy: toXy,
+            numPastTicks: 0,
+            controllerCallback: function() {
+                console.log("asdf")
+                THIS.game.currentWorldRow = to.wr;
+                THIS.game.currentWorldCol = to.wc;
+            }
+        };
+
+        //const xPixelDistance = deltaWorldCol * (this.game.stageNumCols * this.viz.camera.scale * BLOCK_SIZE) - (BLOCK_SIZE * this.viz.camera.scale) / 2;
+        //const xPixelDistance = deltaWorldCol * ((this.game.stageNumCols - 1) * this.game.currentWorldCol * BLOCK_SIZE)
+
+        //const yPixelDistance = deltaWorldRow * (this.game.stageNumRows * this.viz.camera.scale * BLOCK_SIZE) - (BLOCK_SIZE * this.viz.camera.scale) / 2;
+        
+        //console.log(xPixelDistance, yPixelDistance);
+        /*this.stageTweenIncrement = {
+            //STAGE_TWEEN_TICKS
+        };
+        this.stageTween = {
+            from: from,
+            to: to,
+            tickProgress: 0,
+        };*/
+    }
+
     up() {
         if (!this.enabledMovement) {
             return;
         }
-        this.go(-1, 0);
+        const from = {
+            wr: 0,
+            wc: 0,
+        };
+        const to = {
+            wr: 0,
+            wc: 1
+        };
+        this.beginStageTween(from, to);
+
+        //this.go(-1, 0);
     }
     
     down() {
