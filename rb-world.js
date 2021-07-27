@@ -1203,7 +1203,7 @@ class Controller {
         if (!this.enabledMovement || this.viz.camera.stageTween) {
             return;
         }
-        //this.go(-1, 0);
+        this.go(-1, 0);
     }
     
     down() {
@@ -1234,6 +1234,8 @@ class Controller {
         const movement = this.game.moveBall(deltaRow, deltaCol);
         if (movement && movement.trapped) {
             const THIS = this;
+            console.log("trapped", movement, this.game.ball)
+
             this.viz.drawTrapShut(movement, function(){
                 console.log(2);
                 THIS.game.respawn();
@@ -1243,13 +1245,23 @@ class Controller {
             });
         } else if (movement) {
             const THIS = this;
+
+            //console.log("move", movement, this.game.ball, this.game.matrix[this.game.ball.row][this.game.ball.col])
             // if on level boundary
-            if (this.game.ball.col % (this.game.stageNumCols - 1) == 0) {
+            if ((this.game.ball.row % (this.game.stageNumRows - 1) == 0 || 
+                this.game.ball.col % (this.game.stageNumCols - 1) == 0) &&
+                (this.game.matrix[this.game.ball.row][this.game.ball.col] === undefined || 
+                 this.game.matrix[this.game.ball.row][this.game.ball.col].typ != "trap")) {
                 this.launchStageTeeen(deltaRow, deltaCol);
             }
 
             this.viz.drawBallMove(movement, function(){
                 THIS.go(deltaRow, deltaCol);
+
+                /*if (THIS.game.ball.row % (THIS.game.stageNumRows - 1) == 0 || 
+                    THIS.game.ball.col % (THIS.game.stageNumCols - 1) == 0) {
+                    THIS.launchStageTeeen(deltaRow, deltaCol);
+                }*/
             });
 
             
