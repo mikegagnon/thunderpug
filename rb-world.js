@@ -31,7 +31,7 @@ const BLOCK_TYPES = [
 
 
 const WORLD_START_ROW = 0;
-const WORLD_START_COL = 0;
+const WORLD_START_COL = 1;
 const WORLD_ROWS = 7;
 const WORLD_COLS = 7;
 const GAME_NUM_ROWS = 16;// * 7;
@@ -285,8 +285,8 @@ class Game {
         this.stageNumRows = stageNumRows;
         this.stageNumCols = stageNumCols;
 
-        this.numRows = this.stageNumRows * 2 - 1;
-        this.numCols = this.stageNumCols * 2 - 1;
+        this.numRows = (this.stageNumRows - 1) * this.worldNumRows;
+        this.numCols = (this.stageNumCols - 1) * this.worldNumCols;
 
         this.matrix = new Array(this.numRows);
         this.ball = null;
