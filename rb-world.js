@@ -31,7 +31,7 @@ const BLOCK_TYPES = [
 
 
 const WORLD_START_ROW = 0;
-const WORLD_START_COL = 1;
+const WORLD_START_COL = 0;
 const WORLD_ROWS = 7;
 const WORLD_COLS = 7;
 const GAME_NUM_ROWS = 16;// * 7;
@@ -97,11 +97,60 @@ function getRandomInt(min, max) {
 }
 
 
-/*class LevelGenerator {
+class LevelGenerator {
     constructor(world, worldNumRows, worldNumCols, worldStartRow, worldStartCol, stageNumRows, stageNumCols) {
-    }
-}*/
+        this.world = world;
+        this.worldNumRows = worldNumRows;
+        this.worldNumCols = worldNumCols;
+        this.worldStartRow = worldStartRow;
+        this.worldStartCol = worldStartCol;
+        this.stageNumRows = stageNumRows;
+        this.stageNumCols = stageNumCols;
 
+        this.stage = {
+            worldRow: worldStartRow,
+            worldCol: worldStartCol,
+            pieces: [],
+        };
+
+        this.matrix = new Array(this.stageNumRows);
+        for (let row = 0; row < this.stageNumRows; row++) {
+            this.matrix[row] = new Array(this.stageNumCols);
+        }
+
+        this.stageIndex = undefined;
+        for (let i = 0; i < this.world.length; i++) {
+            if (this.world[i].worldRow == this.stage.worldRow && this.world[i].worldCol == this.stage.worldCol) {
+                this.stageIndex = i;
+                break;
+            }
+        }
+        if (this.stageIndex === undefined) {
+            this.stageIndex = this.world.length;
+        }
+        this.world[this.stageIndex] = this.stage;
+
+        this.buildSpawn();
+    }
+
+    buildSpawn() {
+        this.maybeAddPiece("spawn", Math.floor(this.stageNumRows / 2),  Math.floor(this.stageNumCols / 2));
+    }
+
+    maybeAddPiece(typ, row, col) {
+        if (this.matrix[row][col]) {
+            return false;
+        } else {
+            const piece = {
+                typ: typ,
+                row: row,
+                col: col,
+            }
+            this.stage.pieces.push(piece);
+            this.matrix[row][col] = piece;
+        }
+    };
+}
 
 class LevelGeneratorOld {
 
@@ -124,7 +173,7 @@ class LevelGeneratorOld {
         };
         this.matrix = new Array(this.numRows);
         for (let row = 0; row < this.numRows; row++) {
-            this.matrix[row] = new Array(this.numRows);
+            this.matrix[row] = new Array(this.numCols);
         }
 
         this.clearThisStage();
@@ -1337,6 +1386,7 @@ function initRbWorld() {
 
             //GEN = new LevelGenerator(WORLD, WORLD_ROWS, WORLD_COLS, GEN_STAGE_ROW, GEN_STAGE_COL, GAME_NUM_ROWS, GAME_NUM_COLS);
             //WORLD = GEN.getWorld();
+            GEN = new LevelGenerator(WORLD, WORLD_ROWS, WORLD_COLS, WORLD_START_ROW, WORLD_START_COL, GAME_NUM_ROWS, GAME_NUM_COLS);
             GAME = new Game(WORLD, WORLD_ROWS, WORLD_COLS, WORLD_START_ROW, WORLD_START_COL, GAME_NUM_ROWS, GAME_NUM_COLS);
             VIZ = new Viz(queue, GAME, "rb-world-canvas", START_SCALE, MODE);
             CONTROLLER = new Controller(GAME, VIZ);
