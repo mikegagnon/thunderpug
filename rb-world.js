@@ -444,7 +444,7 @@ for (let i = 0; i < NUM_BLOCKS; i++) {
 //const PIECES = GEN.pieces;
 //const PIECES = [{"typ":"token","row":9,"col":15},{"typ":"token","row":15,"col":4},{"typ":"trap","row":0,"col":0},{"typ":"trap","row":0,"col":15},{"typ":"trap","row":1,"col":0},{"typ":"trap","row":1,"col":15},{"typ":"trap","row":2,"col":0},{"typ":"trap","row":2,"col":15},{"typ":"trap","row":3,"col":0},{"typ":"trap","row":3,"col":15},{"typ":"trap","row":4,"col":0},{"typ":"trap","row":4,"col":15},{"typ":"trap","row":5,"col":0},{"typ":"trap","row":5,"col":15},{"typ":"trap","row":6,"col":0},{"typ":"trap","row":6,"col":15},{"typ":"trap","row":7,"col":0},{"typ":"trap","row":7,"col":15},{"typ":"trap","row":8,"col":0},{"typ":"trap","row":8,"col":15},{"typ":"trap","row":9,"col":0},{"typ":"trap","row":10,"col":0},{"typ":"trap","row":10,"col":15},{"typ":"trap","row":11,"col":0},{"typ":"trap","row":11,"col":15},{"typ":"trap","row":12,"col":0},{"typ":"trap","row":12,"col":15},{"typ":"trap","row":13,"col":0},{"typ":"trap","row":13,"col":15},{"typ":"trap","row":14,"col":0},{"typ":"trap","row":14,"col":15},{"typ":"trap","row":15,"col":0},{"typ":"trap","row":15,"col":15},{"typ":"trap","row":0,"col":1},{"typ":"trap","row":15,"col":1},{"typ":"trap","row":0,"col":2},{"typ":"trap","row":15,"col":2},{"typ":"trap","row":0,"col":3},{"typ":"trap","row":15,"col":3},{"typ":"trap","row":0,"col":4},{"typ":"trap","row":0,"col":5},{"typ":"trap","row":15,"col":5},{"typ":"trap","row":0,"col":6},{"typ":"trap","row":15,"col":6},{"typ":"trap","row":0,"col":7},{"typ":"trap","row":15,"col":7},{"typ":"trap","row":0,"col":8},{"typ":"trap","row":15,"col":8},{"typ":"trap","row":0,"col":9},{"typ":"trap","row":15,"col":9},{"typ":"trap","row":0,"col":10},{"typ":"trap","row":15,"col":10},{"typ":"trap","row":0,"col":11},{"typ":"trap","row":15,"col":11},{"typ":"trap","row":0,"col":12},{"typ":"trap","row":15,"col":12},{"typ":"trap","row":0,"col":13},{"typ":"trap","row":15,"col":13},{"typ":"trap","row":0,"col":14},{"typ":"trap","row":15,"col":14},{"typ":"spawn","row":8,"col":8}];
 
-class Solver {
+/*class Solver {
     constructor(world, worldNumRows, worldNumCols, worldStartRow, worldStartCol, stageNumRows, stageNumCols) {
         this.world = world;
         this.worldNumRows = worldNumRows;
@@ -458,8 +458,90 @@ class Solver {
     }
 
     solve() {
-        this.games = [];
-        //this.games.push(new Game(this.world, this.worldNumRows, this.worldNumCols, world));
+        //this.game = new Game(this.world, this.worldNumRows, this.worldNumCols, this.worldStartRow, this.world));
+    }
+
+
+}*/
+
+class Solver {
+    constructor(game) {
+        this.game = game;
+        this.matrix = new Array(this.game.numRows);
+        for (let row = 0; row < this.game.numRows; row++) {
+            this.matrix[row] = new Array(this.numCols);
+            for (let col = 0; col < this.game.numCols; col++) {
+                this.matrix[row][col] = {
+                    top: false,
+                    bottom: false,
+                    left: false,
+                    right: false,
+                    restingPoint: false,
+                }
+            }
+        }
+    }
+
+
+
+    solve(row, col) {
+        if (row == undefined) {
+            row = this.game.ball.row;
+            col = this.game.ball.col;
+        }
+        console.log("solve", row, col)
+
+        this.solveUp(row, col);
+        this.solveDown(row, col);
+        this.solveLeft(row, col);
+        this.solveRight(row, col);
+    }
+
+    solveUp(r, c) {
+        this.solveDir(r, c, -1, 0);
+    }
+
+    solveDown(r, c) {
+        this.solveDir(r, c, 1, 0);
+    }
+
+    solveLeft(r, c) {
+        this.solveDir(r, c, 0, -1);
+    }
+
+    solveRight(r, c) {
+        this.solveDir(r, c, 0, 1);
+    }
+
+    solveDir(r, c, deltaRow, deltaCol) {
+        console.log("asdfasdfsdf")
+        if (this.matrix[r][c].restingPoint) {
+            return "oldRestingPoint";
+        }
+
+        const departingFromPiece = this.game.matrix[r][c];
+        if (departingFromPiece != undefined && departingFromPiece.typ != "spawn") {
+            return "obstacle";
+        }
+
+        const newR = r + deltaRow;
+        const newC = c + deltaCol;
+
+        if (newR < 0 || newR >= this.game.numRows - 1 || newC < 0 || newC >= this.game.numCols - 1) {
+            // dead end
+            return "offworld";
+        }
+
+        const arrivedAtPiece = this.game.matrix[newR][newC];
+
+        if (arrivedAtPiece === undefined) {
+            return this.solveDir(newR, newC, deltaRow, deltaCol);
+        } else {
+            this.matrix[r][c].restingPoint = true;
+            console.log("resting", r, c);
+            this.solve(r, c);
+            return "newRestingPoint";
+        }
     }
 
 
@@ -775,13 +857,15 @@ class Camera {
 }
 
 class Viz {
-    constructor(queue, game, canvasId, scale, mode) {
+    constructor(queue, game, canvasId, scale, mode, solver) {
         this.queue = queue;
         this.game = game;
         this.canvasId = canvasId;
         this.mode = mode;
+        this.solver = solver;
         this.setup();
         this.camera = new Camera(this, this.game, scale);
+
 
         this.stage.update();
         createjs.Ticker.addEventListener("tick", handleTick);
@@ -863,6 +947,23 @@ class Viz {
                 drawSprite(piece, "token")
             }
         });
+
+        if (this.solver) {
+            console.log("solver")
+            for (let r = 0; r < this.solver.game.numRows; r++) {
+                for (let c = 0; c < this.solver.game.numCols; c++) {
+                        console.log("PIEIKEKD")
+                    if (this.solver.matrix[r][c].restingPoint) {
+                        const p = {
+                            typ: "token",
+                            row: r,
+                            col: c
+                        };
+                        drawSprite(p, "token");
+                    }
+                }
+            }
+        }
 
         // Draw ball
         this.ballAnimation = null;
@@ -1511,6 +1612,7 @@ class Controller {
 }
 
 let GAME;
+let SOLVER;
 let VIZ;
 let CONTROLLER;
 
@@ -1539,7 +1641,9 @@ function initRbWorld() {
             //WORLD = GEN.getWorld();
             GEN = new LevelGenerator(WORLD, WORLD_ROWS, WORLD_COLS, WORLD_START_ROW, WORLD_START_COL, GAME_NUM_ROWS, GAME_NUM_COLS);
             GAME = new Game(WORLD, WORLD_ROWS, WORLD_COLS, WORLD_START_ROW, WORLD_START_COL, GAME_NUM_ROWS, GAME_NUM_COLS);
-            VIZ = new Viz(queue, GAME, "rb-world-canvas", START_SCALE, MODE);
+            SOLVER = new Solver(GAME);
+            SOLVER.solve();
+            VIZ = new Viz(queue, GAME, "rb-world-canvas", START_SCALE, MODE, SOLVER);
             CONTROLLER = new Controller(GAME, VIZ);
         }
     }
