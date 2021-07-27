@@ -2,8 +2,8 @@
 const MODE = "dev";
 const GEN_STAGE_ROW = 0;
 const GEN_STAGE_COL = 0;
-const WORLD_START_ROW = 1;
-const WORLD_START_COL = 1;
+const WORLD_START_ROW = 0;
+const WORLD_START_COL = 0;
 
 const FPS = 60;
 const START_SCALE = 2;
