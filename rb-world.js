@@ -97,6 +97,7 @@ function getRandomInt(min, max) {
 }
 
 
+
 class LevelGenerator {
     constructor(world, worldNumRows, worldNumCols, worldStartRow, worldStartCol, stageNumRows, stageNumCols) {
         this.world = world;
@@ -443,6 +444,27 @@ for (let i = 0; i < NUM_BLOCKS; i++) {
 //const PIECES = GEN.pieces;
 //const PIECES = [{"typ":"token","row":9,"col":15},{"typ":"token","row":15,"col":4},{"typ":"trap","row":0,"col":0},{"typ":"trap","row":0,"col":15},{"typ":"trap","row":1,"col":0},{"typ":"trap","row":1,"col":15},{"typ":"trap","row":2,"col":0},{"typ":"trap","row":2,"col":15},{"typ":"trap","row":3,"col":0},{"typ":"trap","row":3,"col":15},{"typ":"trap","row":4,"col":0},{"typ":"trap","row":4,"col":15},{"typ":"trap","row":5,"col":0},{"typ":"trap","row":5,"col":15},{"typ":"trap","row":6,"col":0},{"typ":"trap","row":6,"col":15},{"typ":"trap","row":7,"col":0},{"typ":"trap","row":7,"col":15},{"typ":"trap","row":8,"col":0},{"typ":"trap","row":8,"col":15},{"typ":"trap","row":9,"col":0},{"typ":"trap","row":10,"col":0},{"typ":"trap","row":10,"col":15},{"typ":"trap","row":11,"col":0},{"typ":"trap","row":11,"col":15},{"typ":"trap","row":12,"col":0},{"typ":"trap","row":12,"col":15},{"typ":"trap","row":13,"col":0},{"typ":"trap","row":13,"col":15},{"typ":"trap","row":14,"col":0},{"typ":"trap","row":14,"col":15},{"typ":"trap","row":15,"col":0},{"typ":"trap","row":15,"col":15},{"typ":"trap","row":0,"col":1},{"typ":"trap","row":15,"col":1},{"typ":"trap","row":0,"col":2},{"typ":"trap","row":15,"col":2},{"typ":"trap","row":0,"col":3},{"typ":"trap","row":15,"col":3},{"typ":"trap","row":0,"col":4},{"typ":"trap","row":0,"col":5},{"typ":"trap","row":15,"col":5},{"typ":"trap","row":0,"col":6},{"typ":"trap","row":15,"col":6},{"typ":"trap","row":0,"col":7},{"typ":"trap","row":15,"col":7},{"typ":"trap","row":0,"col":8},{"typ":"trap","row":15,"col":8},{"typ":"trap","row":0,"col":9},{"typ":"trap","row":15,"col":9},{"typ":"trap","row":0,"col":10},{"typ":"trap","row":15,"col":10},{"typ":"trap","row":0,"col":11},{"typ":"trap","row":15,"col":11},{"typ":"trap","row":0,"col":12},{"typ":"trap","row":15,"col":12},{"typ":"trap","row":0,"col":13},{"typ":"trap","row":15,"col":13},{"typ":"trap","row":0,"col":14},{"typ":"trap","row":15,"col":14},{"typ":"spawn","row":8,"col":8}];
 
+class Solver {
+    constructor(world, worldNumRows, worldNumCols, worldStartRow, worldStartCol, stageNumRows, stageNumCols) {
+        this.world = world;
+        this.worldNumRows = worldNumRows;
+        this.worldNumCols = worldNumCols;
+        this.worldStartRow = worldStartRow;
+        this.worldStartCol = worldStartCol;
+        this.currentWorldRow = worldStartRow;
+        this.currentWorldCol = worldStartCol;
+        this.stageNumRows = stageNumRows;
+        this.stageNumCols = stageNumCols;
+    }
+
+    solve() {
+        this.games = [];
+        //this.games.push(new Game(this.world, this.worldNumRows, this.worldNumCols, world));
+    }
+
+
+}
+
 class Game {
     constructor(world, worldNumRows, worldNumCols, worldStartRow, worldStartCol, stageNumRows, stageNumCols) {
         this.world = world;
@@ -452,12 +474,12 @@ class Game {
         this.worldStartCol = worldStartCol;
         this.currentWorldRow = worldStartRow;
         this.currentWorldCol = worldStartCol;
+        this.stageNumRows = stageNumRows;
+        this.stageNumCols = stageNumCols;
 
         this.pieces = this.compileWorld(this.world);
         //this.randomBlocks();
 
-        this.stageNumRows = stageNumRows;
-        this.stageNumCols = stageNumCols;
 
         this.numRows = (this.stageNumRows - 1) * this.worldNumRows + 1;
         this.numCols = (this.stageNumCols - 1) * this.worldNumCols + 1;
@@ -1066,8 +1088,9 @@ class Viz {
             init: function(animation) {
                 //animation.gotoAndPlay("color");
                 const frame = Math.floor(Math.random() * 12);
-                //animation.framerate = 1;
-                animation.gotoAndStop(frame);
+                animation.framerate = 5;
+                animation.gotoAndPlay(frame);
+                //animation.gotoAndStop(frame);
             }
         }
 
