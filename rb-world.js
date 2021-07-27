@@ -206,29 +206,36 @@ class LevelGenerator {
 
         // TODO: bottom-most and right-most stages should not have exits
     buildExits() {
-        const leftExitRow = this.getExitNeighbor(0, -1);
-        const rightExitRow = this.getExitNeighbor(0, 1);
-        const topExitCol = this.getExitNeighbor(-1, 0);
-        const bottomExitCol = this.getExitNeighbor(1, 0);
+        let leftExitRow = this.getExitNeighbor(0, -1);
+        let rightExitRow = this.getExitNeighbor(0, 1);
+        let topExitCol = this.getExitNeighbor(-1, 0);
+        let bottomExitCol = this.getExitNeighbor(1, 0);
 
         console.log(leftExitRow, rightExitRow, topExitCol, bottomExitCol);
 
-        /*if (this.stage.worldRow > 0) {
-            // build top exit based on stage from above
-            throw new Error("unimplemented");
-        }
-        if (this.stage.worldCol > 0) {
-            // build left exit based on stage from left
-            //throw new Error("unimplemented");
-            const prevStage = this.getStage(this.stage.worldRow, this.stage.worldCol - 1);
-            for (let i = 0; i < prevStage.pieces.length; i++) {
-                const p = prevStage.pieces[i];
-                if (p.col == this.numCols - 1 && p.typ == "token") {
-                    this.maybeAddPiece("token", p.row, 0);
-                }
-            }
-        }*/
 
+        const ROW_JITTER_SPAN = Math.floor(this.stageNumRows / 2);
+        const COL_JITTER_SPAN = Math.floor(this.stageNumCols / 2);
+
+        if (leftExitRow === undefined) {
+            leftExitRow = Math.floor((Math.floor(Math.random() * ROW_JITTER_SPAN) - Math.floor(ROW_JITTER_SPAN / 2)) + Math.floor(this.stageNumRows / 2));
+        }
+        if (rightExitRow === undefined) {
+            rightExitRow = Math.floor((Math.floor(Math.random() * ROW_JITTER_SPAN) - Math.floor(ROW_JITTER_SPAN / 2)) + Math.floor(this.stageNumRows / 2));
+        }
+        if (topExitCol === undefined) {
+            topExitCol = Math.floor((Math.floor(Math.random() * COL_JITTER_SPAN) - Math.floor(COL_JITTER_SPAN / 2)) + Math.floor(this.stageNumCols / 2));
+        }
+        if (bottomExitCol === undefined) {
+            bottomExitCol = Math.floor((Math.floor(Math.random() * COL_JITTER_SPAN) - Math.floor(COL_JITTER_SPAN / 2)) + Math.floor(this.stageNumCols / 2));
+        }
+
+        console.log(leftExitRow, rightExitRow, topExitCol, bottomExitCol);
+
+        this.maybeAddPiece("token", leftExitRow, 0);
+        this.maybeAddPiece("token", rightExitRow, this.stageNumCols - 1);
+        this.maybeAddPiece("token", 0, topExitCol);
+        this.maybeAddPiece("token", this.stageNumRows - 1, bottomExitCol);
 
 
 
