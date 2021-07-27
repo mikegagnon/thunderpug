@@ -642,6 +642,9 @@ class Viz {
         function handleTick(event) {
             THIS.handleTick(event);
         }
+        this.camera.centerStage();
+        this.camera.placeCamera();
+        this.stage.update();
     }
 
     setup() {
@@ -997,8 +1000,8 @@ class Viz {
             this.camera.centerStageTween();
             this.camera.placeCamera();
         } else if (this.camera.trackingStage) {
-            this.camera.centerStage();
-            this.camera.placeCamera();
+            /*this.camera.centerStage();
+            this.camera.placeCamera();*/
         } 
         this.stage.update(event);
     }
