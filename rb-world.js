@@ -422,6 +422,12 @@ class Game {
             return null;
         }
 
+        if (arrivedAtPiece != undefined && arrivedAtPiece.typ == "spawn") {
+        //if (this.cellContainsBlock(arrivedAtCell)) {
+            // TODO
+            this.spawnPiece = arrivedAtPiece;
+        }
+
         
         //const trapped = this.cellContainsTrap(arrivedAtCell);
 
@@ -535,6 +541,7 @@ class Camera {
         if (this.stageTween.numPastTicks >= STAGE_TWEEN_TICKS) {
             this.stageTween.controllerCallback();
             this.stageTween = null;
+            this.trackingStage = true;
         } else {
             this.stageTween.numPastTicks += 1;
             const p = this.stageTween.numPastTicks / STAGE_TWEEN_TICKS;
@@ -1178,8 +1185,11 @@ class Controller {
             numPastTicks: 0,
             controllerCallback: function() {
                 console.log("asdf")
+                // TODO: put in game class
                 THIS.game.currentWorldRow = to.wr;
                 THIS.game.currentWorldCol = to.wc;
+                //THIS.game.spawnPiece = THIS.game.world[]
+
             }
         };
 
