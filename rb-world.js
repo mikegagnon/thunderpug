@@ -472,7 +472,11 @@ class Camera {
     // center stage (as in level), as opposed to stage (as in createjs stage)
     centerStage() {
         const stage = this.game.worldMatrix[this.game.currentWorldRow][this.game.currentWorldCol];
-        const spawnX = ddd
+        const spawnX = stage.spawn.animation.x;
+        const spawnY = stage.spawn.animation.y;
+        console.log(spawnX, spawnY)
+        this.center.x = (spawnX + BLOCK_SIZE / 2) * this.scale;
+        this.center.y = (spawnY + BLOCK_SIZE / 2) * this.scale;
     }
 
     zoom(scale) {
@@ -592,7 +596,7 @@ class Viz {
             } else if (piece.typ == "block") {
                 drawSprite(piece, "block");
             } else if (piece.typ == "spawn") {
-                drawSprite(piece, "spawn");
+                piece.animation = drawSprite(piece, "spawn");
             } else if (piece.typ == "token") {
                 drawSprite(piece, "token")
             }
@@ -876,6 +880,9 @@ class Viz {
     handleTick(event) {
         if (this.camera.trackingBall) {
             this.camera.centerBall();
+            this.camera.placeCamera();
+        } else if (this.camera.trackingStage) {
+            this.camera.centerStage();
             this.camera.placeCamera();
         }
         this.stage.update(event);
