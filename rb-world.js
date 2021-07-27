@@ -290,10 +290,9 @@ class Game {
                 piece.col += (GAME_NUM_ROWS - 1) * wc;
                 pieces.push(piece);
                 if (piece.typ == "spawn") {
-                    stage.spawn = {
-                        row: piece.row,
-                        col: piece.col,
-                    }
+                    stage.spawn = piece;
+                    piece.worldRow = wr;
+                    piece.worldCol = wc;
                 }
             }
         }
@@ -328,7 +327,7 @@ class Game {
     }
 
     addPiece(piece) {
-        if (piece.typ === "spawn") {
+        if (piece.typ === "spawn" && piece.worldRow == this.worldStartRow && piece.worldCol == this.worldStartCol) {
             const ballPiece = {
                 typ: "ball",
                 row: piece.row,
