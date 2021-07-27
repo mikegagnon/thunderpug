@@ -289,6 +289,12 @@ class Game {
                 piece.row += (GAME_NUM_ROWS - 1) * wr;
                 piece.col += (GAME_NUM_ROWS - 1) * wc;
                 pieces.push(piece);
+                if (piece.typ == "spawn") {
+                    stage.spawn = {
+                        row: piece.row,
+                        col: piece.col,
+                    }
+                }
             }
         }
         return pieces;
