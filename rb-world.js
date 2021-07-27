@@ -24,7 +24,7 @@ const BLOCK_TYPES = [
 
 
 const WORLD_START_ROW = 0;
-const WORLD_START_COL = 0;
+const WORLD_START_COL = 1;
 const WORLD_ROWS = 7;
 const WORLD_COLS = 7;
 const GAME_NUM_ROWS = 16;// * 7;
@@ -93,14 +93,17 @@ function getRandomInt(min, max) {
 
 class LevelGenerator {
 
-    constructor(world, numWorldRows, numWorldCols, worldRow, worldCol, numRows, numCols) {
+    constructor(world, numWorldRows, numWorldCols, worldRow, worldCol, stageNumRows, stageNumCols) {
         this.world = world;
         this.numWorldRows = numWorldRows;
         this.numWorldCols = numWorldCols;
         //this.worldRow = worldRow;
         //this.worldCol = worldCol;
-        this.numRows = numRows;
-        this.numCols = numCols;
+        this.stageNumRows = stageNumRows;
+        this.stageNumCols = stageNumCols;
+
+        this.numRows = this.stageNumRows;
+        this.numCols = this.stageNumCols;
 
         this.stage = {
             worldRow: worldRow,
@@ -249,7 +252,7 @@ for (let i = 0; i < NUM_BLOCKS; i++) {
 //const PIECES = [{"typ":"token","row":9,"col":15},{"typ":"token","row":15,"col":4},{"typ":"trap","row":0,"col":0},{"typ":"trap","row":0,"col":15},{"typ":"trap","row":1,"col":0},{"typ":"trap","row":1,"col":15},{"typ":"trap","row":2,"col":0},{"typ":"trap","row":2,"col":15},{"typ":"trap","row":3,"col":0},{"typ":"trap","row":3,"col":15},{"typ":"trap","row":4,"col":0},{"typ":"trap","row":4,"col":15},{"typ":"trap","row":5,"col":0},{"typ":"trap","row":5,"col":15},{"typ":"trap","row":6,"col":0},{"typ":"trap","row":6,"col":15},{"typ":"trap","row":7,"col":0},{"typ":"trap","row":7,"col":15},{"typ":"trap","row":8,"col":0},{"typ":"trap","row":8,"col":15},{"typ":"trap","row":9,"col":0},{"typ":"trap","row":10,"col":0},{"typ":"trap","row":10,"col":15},{"typ":"trap","row":11,"col":0},{"typ":"trap","row":11,"col":15},{"typ":"trap","row":12,"col":0},{"typ":"trap","row":12,"col":15},{"typ":"trap","row":13,"col":0},{"typ":"trap","row":13,"col":15},{"typ":"trap","row":14,"col":0},{"typ":"trap","row":14,"col":15},{"typ":"trap","row":15,"col":0},{"typ":"trap","row":15,"col":15},{"typ":"trap","row":0,"col":1},{"typ":"trap","row":15,"col":1},{"typ":"trap","row":0,"col":2},{"typ":"trap","row":15,"col":2},{"typ":"trap","row":0,"col":3},{"typ":"trap","row":15,"col":3},{"typ":"trap","row":0,"col":4},{"typ":"trap","row":0,"col":5},{"typ":"trap","row":15,"col":5},{"typ":"trap","row":0,"col":6},{"typ":"trap","row":15,"col":6},{"typ":"trap","row":0,"col":7},{"typ":"trap","row":15,"col":7},{"typ":"trap","row":0,"col":8},{"typ":"trap","row":15,"col":8},{"typ":"trap","row":0,"col":9},{"typ":"trap","row":15,"col":9},{"typ":"trap","row":0,"col":10},{"typ":"trap","row":15,"col":10},{"typ":"trap","row":0,"col":11},{"typ":"trap","row":15,"col":11},{"typ":"trap","row":0,"col":12},{"typ":"trap","row":15,"col":12},{"typ":"trap","row":0,"col":13},{"typ":"trap","row":15,"col":13},{"typ":"trap","row":0,"col":14},{"typ":"trap","row":15,"col":14},{"typ":"spawn","row":8,"col":8}];
 
 class Game {
-    constructor(world, worldNumRows, worldNumCols, worldStartRow, worldStartCol, numRows, numCols) {
+    constructor(world, worldNumRows, worldNumCols, worldStartRow, worldStartCol, stageNumRows, stageNumCols) {
         this.world = world;
         this.worldNumRows = worldNumRows;
         this.worldNumCols = worldNumCols;
@@ -261,8 +264,12 @@ class Game {
         this.pieces = this.compileWorld(this.world);
         this.randomBlocks();
 
-        this.numRows = numRows;
-        this.numCols = numCols;
+        this.stageNumRows = stageNumRows;
+        this.stageNumCols = stageNumCols;
+
+        this.numRows = this.stageNumRows;
+        this.numCols = this.stageNumCols * 2 - 1;
+
         this.matrix = new Array(this.numRows);
         this.ball = null;
         this.begun = false;
@@ -471,12 +478,14 @@ class Camera {
 
     // center stage (as in level), as opposed to stage (as in createjs stage)
     centerStage() {
-        const stage = this.game.worldMatrix[this.game.currentWorldRow][this.game.currentWorldCol];
-        const spawnX = stage.spawn.animation.x;
-        const spawnY = stage.spawn.animation.y;
-        console.log(spawnX, spawnY)
-        this.center.x = (spawnX + BLOCK_SIZE / 2) * this.scale;
-        this.center.y = (spawnY + BLOCK_SIZE / 2) * this.scale;
+        //const stage = this.game.worldMatrix[this.game.currentWorldRow][this.game.currentWorldCol];
+        //const centerStageX = stage.spawn.animation.x;
+        //const centerStageY = stage.spawn.animation.y;
+        //console.log(spawnX, spawnY)
+        const x = ((this.game.currentWorldCol * (this.game.stageNumCols - 1)) + ((this.game.stageNumCols - 0) / 2)) * BLOCK_SIZE;
+        const y = ((this.game.currentWorldRow * (this.game.stageNumRows - 1)) + ((this.game.stageNumRows - 0) / 2)) * BLOCK_SIZE;
+        this.center.x = x * this.scale;
+        this.center.y = y * this.scale;
     }
 
     zoom(scale) {
@@ -1188,7 +1197,7 @@ function initRbWorld() {
     ]);
     function handleComplete() {
         if (MODE == "play") {
-            GAME = new Game(WORLD, WORLD_ROWS, WORLD_COLS, WORLD_START_ROW, WORLD_START_COL, GAME_NUM_ROWS, GAME_NUM_COLS * 2 - 1);
+            GAME = new Game(WORLD, WORLD_ROWS, WORLD_COLS, WORLD_START_ROW, WORLD_START_COL, GAME_NUM_ROWS, GAME_NUM_COLS);
             VIZ = new Viz(queue, GAME, "rb-world-canvas", START_SCALE, MODE);
             CONTROLLER = new Controller(GAME, VIZ);
         } /*else {
