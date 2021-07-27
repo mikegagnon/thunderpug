@@ -2,8 +2,8 @@
 const MODE = "dev";
 const GEN_STAGE_ROW = 0;
 const GEN_STAGE_COL = 0;
-const WORLD_START_ROW = 1;
-const WORLD_START_COL = 1;
+const WORLD_START_ROW = 0;
+const WORLD_START_COL = 0;
 
 const FPS = 60;
 const START_SCALE = 2;
@@ -131,6 +131,7 @@ class LevelGenerator {
         this.world[this.stageIndex] = this.stage;
 
         this.buildSpawn();
+        this.buildExits();
     }
 
     buildSpawn() {
@@ -150,6 +151,88 @@ class LevelGenerator {
             this.matrix[row][col] = piece;
         }
     };
+
+    getExitNeighbor(deltaWorldRow, deltaWorldCol) {
+        const wr = deltaWorldRow + this.stage.worldRow;
+        const wc = deltaWorldCol + this.stage.worldCol;
+        const neighborStage = this.getStage(wr, wc);
+        
+        if (neighborStage === undefined) {
+            return undefined;
+        }
+
+        if (deltaWorldCol == -1) {
+            for (let i = 0; i < neighborStage.pieces.length; i++) {
+                const p = neighborStage.pieces[i];
+                if (p.col == this.stageNumCols - 1 && p.typ == "token") {
+                    return p.row;
+                }
+            }
+        } else if (deltaWorldCol == 1) {
+            for (let i = 0; i < neighborStage.pieces.length; i++) {
+                const p = neighborStage.pieces[i];
+                if (p.col == 0 && p.typ == "token") {
+                    return p.row;
+                }
+            }
+        } else if (deltaWorldRow == -1) {
+            for (let i = 0; i < neighborStage.pieces.length; i++) {
+                const p = neighborStage.pieces[i];
+                if (p.row == this.stageNumRows - 1 && p.typ == "token") {
+                    return p.col;
+                }
+            }
+        } else if (deltaWorldRow == 1) {
+            for (let i = 0; i < neighborStage.pieces.length; i++) {
+                const p = neighborStage.pieces[i];
+                if (p.row == 0 && p.typ == "token") {
+                    return p.col;
+                }
+            }
+        } else {
+            throw new Error("bad");
+        }
+
+    }
+
+    getStage(worldRow, worldCol) {
+        for (let i = 0; i < this.world.length; i++) {
+            if (this.world[i].worldRow == worldRow && this.world[i].worldCol == worldCol) {
+                return this.world[i];
+            }
+        }
+        return undefined;
+    }
+
+        // TODO: bottom-most and right-most stages should not have exits
+    buildExits() {
+        const leftExitRow = this.getExitNeighbor(0, -1);
+        const rightExitRow = this.getExitNeighbor(0, 1);
+        const topExitCol = this.getExitNeighbor(-1, 0);
+        const bottomExitCol = this.getExitNeighbor(1, 0);
+
+        console.log(leftExitRow, rightExitRow, topExitCol, bottomExitCol);
+
+        /*if (this.stage.worldRow > 0) {
+            // build top exit based on stage from above
+            throw new Error("unimplemented");
+        }
+        if (this.stage.worldCol > 0) {
+            // build left exit based on stage from left
+            //throw new Error("unimplemented");
+            const prevStage = this.getStage(this.stage.worldRow, this.stage.worldCol - 1);
+            for (let i = 0; i < prevStage.pieces.length; i++) {
+                const p = prevStage.pieces[i];
+                if (p.col == this.numCols - 1 && p.typ == "token") {
+                    this.maybeAddPiece("token", p.row, 0);
+                }
+            }
+        }*/
+
+
+
+
+    }
 }
 
 class LevelGeneratorOld {
