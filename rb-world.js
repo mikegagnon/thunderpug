@@ -133,10 +133,24 @@ class LevelGenerator {
         this.buildSpawn();
         this.buildExits();
         this.buildBorder();
+        this.buildBlocks();
     }
 
     buildSpawn() {
         this.maybeAddPiece("spawn", Math.floor(this.stageNumRows / 2),  Math.floor(this.stageNumCols / 2));
+    }
+
+    buildBlocks() {
+        for (let i = 0; i < NUM_BLOCKS; i++) {
+            
+
+            const row = getRandomInt(1, this.stageNumRows - 1);
+            const col = getRandomInt(1, this.stageNumCols - 1);
+            //if (piece.row)
+
+            //this.pieces.push(piece);
+            this.maybeAddPiece("block", row, col);
+        }
     }
 
     maybeAddPiece(typ, row, col) {
