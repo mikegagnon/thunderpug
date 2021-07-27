@@ -1180,7 +1180,6 @@ class Controller {
                 console.log("asdf")
                 THIS.game.currentWorldRow = to.wr;
                 THIS.game.currentWorldCol = to.wc;
-                //THIS.ena
             }
         };
 
@@ -1204,16 +1203,6 @@ class Controller {
         if (!this.enabledMovement || this.viz.camera.stageTween) {
             return;
         }
-        const from = {
-            wr: 0,
-            wc: 0,
-        };
-        const to = {
-            wr: 0,
-            wc: 1
-        };
-        this.beginStageTween(from, to);
-
         //this.go(-1, 0);
     }
     
@@ -1254,12 +1243,31 @@ class Controller {
             });
         } else if (movement) {
             const THIS = this;
+            // if on level boundary
+            if (this.game.ball.col % (this.game.stageNumCols - 1) == 0) {
+                this.launchStageTeeen(deltaRow, deltaCol);
+            }
+
             this.viz.drawBallMove(movement, function(){
                 THIS.go(deltaRow, deltaCol);
             });
+
+            
         } else {
             this.enableMove();
         }
+    }
+
+    launchStageTeeen(deltaRow, deltaCol) {
+        const from = {
+            wr: this.game.currentWorldRow,
+            wc: this.game.currentWorldCol,
+        };
+        const to = {
+            wr: from.wr + deltaRow,
+            wc: from.wc + deltaCol,
+        };
+        this.beginStageTween(from, to);
     }
 }
 
