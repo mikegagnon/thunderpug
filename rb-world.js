@@ -36,7 +36,7 @@ const WORLD_ROWS = 2;
 const WORLD_COLS = 2;
 const GAME_NUM_ROWS = 16;// * 7;
 const GAME_NUM_COLS = 16;// * 7;
-const NUM_BLOCKS = 5//000;
+const NUM_BLOCKS = 50//000;
 //const NUM_BLOCKS = 5;
 
 //const GAME_NUM_ROWS = 5;
