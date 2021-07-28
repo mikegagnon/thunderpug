@@ -829,7 +829,38 @@ class Viz {
         });
 
         if (this.solver) {
-            console.log("solver")
+            console.log("solver");
+
+            const line = new createjs.Shape();
+            line.graphics.setStrokeStyle(1).beginStroke("#444");
+
+            function drawSolutionLine(r, c, direction) {
+                let dx = 0;
+                let dy = 0;
+
+                if (direction == "top") {
+                    dy = -BLOCK_SIZE / 2;
+                } else if (direction == "bottom") {
+                    dy = BLOCK_SIZE / 2;
+                } else if (direction == "left") {
+                    dx = -BLOCK_SIZE / 2;
+                } else if (direction == "right") {
+                    dx = BLOCK_SIZE / 2;
+                } else {
+                    throw new Error();
+                }
+
+                const startX = c * BLOCK_SIZE + BLOCK_SIZE / 2;
+                const startY = r * BLOCK_SIZE + BLOCK_SIZE / 2;
+                line.graphics.moveTo(startX, startY);
+
+                const destX = startX + dx;
+                const destY = startY + dy;
+                line.graphics.lineTo(destX, destY);
+                //line.graphics.lineTo(this.game.constant.numCols * BLOCK_SIZE, rowIndex * BLOCK_SIZE);
+                line.graphics.endStroke();
+            }
+
             for (let r = 0; r < this.solver.game.constant.numRows; r++) {
                 for (let c = 0; c < this.solver.game.constant.numCols; c++) {
                         console.log("PIEIKEKD")
@@ -841,8 +872,29 @@ class Viz {
                         };
                         drawSprite(p, "restingPoint");
                     }
+
+                    /*if (this.solver.matrix[r][c].comingIn.top || this.solver.matrix[r][c].comingIn.bottom || this.solver.matrix[r][c].comingIn.left || this.solver.matrix[r][c].comingIn.right) {
+                        drawSolutionLine(r, c, "foo");
+                    }*/
+
+                    if (this.solver.matrix[r][c].comingIn.top || this.solver.matrix[r][c].goingOut.top) {
+                        drawSolutionLine(r, c, "top");
+                    }
+                    if (this.solver.matrix[r][c].comingIn.bottom || this.solver.matrix[r][c].goingOut.bottom) {
+                        drawSolutionLine(r, c, "bottom");
+                    }
+                    if (this.solver.matrix[r][c].comingIn.left || this.solver.matrix[r][c].goingOut.left) {
+                        drawSolutionLine(r, c, "left");
+                    }
+                    if (this.solver.matrix[r][c].comingIn.right || this.solver.matrix[r][c].goingOut.right) {
+                        drawSolutionLine(r, c, "left");
+                    }
                 }
             }
+
+            this.container.addChild(line);
+            line.cache(0, 0, this.game.constant.numCols * BLOCK_SIZE, this.game.constant.numRows * BLOCK_SIZE)
+
         }
 
         // Draw ball
