@@ -36,7 +36,7 @@ const WORLD_ROWS = 2;
 const WORLD_COLS = 2;
 const GAME_NUM_ROWS = 16;// * 7;
 const GAME_NUM_COLS = 16;// * 7;
-const NUM_BLOCKS = 50//000;
+const NUM_BLOCKS = 25//000;
 //const NUM_BLOCKS = 5;
 
 //const GAME_NUM_ROWS = 5;
@@ -380,94 +380,7 @@ class Solver {
     }
 }
 
-class SolverOld {
-    constructor(game) {
-        this.game = game;
-        this.matrix = new Array(this.game.constant.numRows);
-        for (let row = 0; row < this.game.constant.numRows; row++) {
-            this.matrix[row] = new Array(this.game.constant.numCols);
-            for (let col = 0; col < this.game.constant.numCols; col++) {
-                this.matrix[row][col] = {
-                    top: false,
-                    bottom: false,
-                    left: false,
-                    right: false,
-                    restingPoint: false,
-                }
-            }
-        }
-    }
 
-    solve(gameClone) {
-        if (!gameClone) {
-            gameClone = this.game.clone();
-        }
-        this.solveUp();
-        //this.solveDown();
-        //this.solveLeft();
-        //this.solveRight();
-    }
-
-    solveUp(r, c) {
-        this.solveDir(-1, 0);
-    }
-
-    solveDown(r, c) {
-        this.solveDir(1, 0);
-    }
-
-    solveLeft(r, c) {
-        this.solveDir(0, -1);
-    }
-
-    solveRight(r, c) {
-        this.solveDir(0, 1);
-    }
-
-    solveDir(deltaRow, deltaCol) {
-        const gameClone = this.game.clone();
-
-        do {
-            gameClone.moveBall(deltaRow, deltaCol)
-        } while (gameClone.momentum != null);
-
-        if (!this.matrix[gameClone.ballPiece.row][gameClone.ballPiece.col].restingPoint) {
-            this.matrix[gameClone.ballPiece.row][gameClone.ballPiece.col].restingPoint = true;
-            this.solve(gameClone);
-        }
-
-        //if ()
-
-        //console.log("asdfasdfsdf")
-        
-
-        const departingFromPiece = this.game.constant.matrix[r][c];
-        if (departingFromPiece != undefined && departingFromPiece.typ != "spawn") {
-            return "obstacle";
-        }
-
-        const newR = r + deltaRow;
-        const newC = c + deltaCol;
-
-        if (newR < 0 || newR >= this.game.constant.numRows - 1 || newC < 0 || newC >= this.game.constant.numCols - 1) {
-            // dead end
-            return "offworld";
-        }
-
-        const arrivedAtPiece = this.game.constant.matrix[newR][newC];
-
-        if (arrivedAtPiece === undefined) {
-            return this.solveDir(newR, newC, deltaRow, deltaCol);
-        } else if (!this.matrix[r][c].restingPoint && arrivedAtPiece.typ == "block") {
-            this.matrix[r][c].restingPoint = true;
-            console.log("resting", r, c);
-            this.solve(r, c);
-            return "newRestingPoint";
-        }
-    }
-
-
-}
 
 class Game {
 
@@ -604,13 +517,15 @@ class Game {
 
     moveBall(deltaRow, deltaCol) {
         const beforePiece = this.constant.matrix[this.ballPiece.row][this.ballPiece.col];
-        this.momentum = null;
 
         if (beforePiece && beforePiece.typ === "trap") {
+            this.momentum = null;
+
             return { trapped: beforePiece };
         }
 
         if (beforePiece && beforePiece.typ === "spawn" && this.momentum) {
+            this.momentum = null;
             return null;
         }
 
@@ -619,12 +534,14 @@ class Game {
 
         if (newRow < 0 || newRow >= this.constant.numRows || newCol < 0 || newCol >= this.constant.numCols) {
             // TODO
+            this.momentum = null;
             return null;
         }
 
         const arrivedAtPiece = this.constant.matrix[newRow][newCol];
 
         if (arrivedAtPiece != undefined && arrivedAtPiece.typ == "block") {
+            this.momentum = null;
             return null;
         }
 
@@ -632,13 +549,14 @@ class Game {
             this.spawnPiece = arrivedAtPiece;
         }
 
-        this.ballPiece.row = newRow;
-        this.ballPiece.col = newCol;
         this.momentum = {
             deltaRow: deltaRow,
             deltaCol: deltaCol,
         };
-
+        
+        this.ballPiece.row = newRow;
+        this.ballPiece.col = newCol;
+        
         return {
             deltaRow: deltaRow,
             deltaCol: deltaCol,
