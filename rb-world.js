@@ -467,10 +467,10 @@ for (let i = 0; i < NUM_BLOCKS; i++) {
 class Solver {
     constructor(game) {
         this.game = game;
-        this.matrix = new Array(this.game.numRows);
-        for (let row = 0; row < this.game.numRows; row++) {
-            this.matrix[row] = new Array(this.numCols);
-            for (let col = 0; col < this.game.numCols; col++) {
+        this.matrix = new Array(this.game.constant.numRows);
+        for (let row = 0; row < this.game.constant.numRows; row++) {
+            this.matrix[row] = new Array(this.game.constant.numCols);
+            for (let col = 0; col < this.game.constant.numCols; col++) {
                 this.matrix[row][col] = {
                     top: false,
                     bottom: false,
@@ -486,8 +486,8 @@ class Solver {
 
     solve(row, col) {
         if (row == undefined) {
-            row = this.game.ball.row;
-            col = this.game.ball.col;
+            row = this.game.ballPiece.row;
+            col = this.game.ballPiece.col;
         }
         console.log("solve", row, col)
 
@@ -517,7 +517,7 @@ class Solver {
         //console.log("asdfasdfsdf")
         
 
-        const departingFromPiece = this.game.matrix[r][c];
+        const departingFromPiece = this.game.constant.matrix[r][c];
         if (departingFromPiece != undefined && departingFromPiece.typ != "spawn") {
             return "obstacle";
         }
@@ -525,12 +525,12 @@ class Solver {
         const newR = r + deltaRow;
         const newC = c + deltaCol;
 
-        if (newR < 0 || newR >= this.game.numRows - 1 || newC < 0 || newC >= this.game.numCols - 1) {
+        if (newR < 0 || newR >= this.game.constant.numRows - 1 || newC < 0 || newC >= this.game.constant.numCols - 1) {
             // dead end
             return "offworld";
         }
 
-        const arrivedAtPiece = this.game.matrix[newR][newC];
+        const arrivedAtPiece = this.game.constant.matrix[newR][newC];
 
         if (arrivedAtPiece === undefined) {
             return this.solveDir(newR, newC, deltaRow, deltaCol);
@@ -546,6 +546,172 @@ class Solver {
 }
 
 class Game {
+
+    static build(world, worldNumRows, worldNumCols, worldStartRow, worldStartCol, stageNumRows, stageNumCols) {
+        const constant = Game.loadConstant(world, worldNumRows, worldNumCols, worldStartRow, worldStartCol, stageNumRows, stageNumCols);
+        return new Game(constant);
+    }
+
+    static loadConstant(world, worldNumRows, worldNumCols, worldStartRow, worldStartCol, stageNumRows, stageNumCols) {
+        const constant = {
+            world: world,
+            worldNumRows: worldNumRows,
+            worldNumCols: worldNumCols,
+            worldStartRow: worldStartRow,
+            worldStartCol: worldStartCol,
+            stageNumRows: stageNumRows,
+            stageNumCols: stageNumCols,
+            numRows: (stageNumRows - 1) * worldNumRows + 1,
+            numCols: (stageNumCols - 1) * worldNumCols + 1,
+        };
+
+        constant.worldMatrix = Game.initWorldMatrix(constant);
+        constant.pieces = Game.initPieces(constant);
+        constant.matrix = Game.initMatrix(constant);
+
+        return constant;
+    }
+
+    static initMatrix(constant) {
+        const matrix = new Array(constant.numRows);
+        
+        for (let row = 0; row < constant.numRows; row++) {
+            matrix[row] = new Array(constant.numCols);
+        }
+
+        for (let i = 0; i < constant.pieces.length; i++) {
+            const piece = constant.pieces[i];
+            //Game.addPiece(matrix, piece);
+            if (matrix[piece.row][piece.col] === undefined) {
+                matrix[piece.row][piece.col] = piece;
+            } else {
+                // TODO
+            }
+        }
+
+        return matrix;
+    }
+
+    static initWorldMatrix(constant) {
+        const worldMatrix = new Array(constant.worldNumRows);
+        for (let r = 0; r < constant.worldNumRows; r++) {
+            worldMatrix[r] = new Array(constant.worldNumCols);
+        }
+        return worldMatrix;
+    }
+
+    static initPieces(constant) {
+        const pieces = [];
+        for (let i = 0; i < constant.world.length; i++) {
+            const stage = constant.world[i];
+            const wr = stage.worldRow;
+            const wc = stage.worldCol;
+            const wp = stage.pieces;
+            constant.worldMatrix[wr][wc] = stage;
+            for (let j = 0; j < wp.length; j++) {
+                const piece = wp[j];
+                piece.row += (constant.stageNumRows - 1) * wr;
+                piece.col += (constant.stageNumCols - 1) * wc;
+                pieces.push(piece);
+                if (piece.typ == "spawn") {
+                    stage.spawn = piece;
+                    piece.worldRow = wr;
+                    piece.worldCol = wc;
+                }
+            }
+        }
+        return pieces;
+    }
+
+    constructor(constant) {
+        this.constant = constant;
+
+
+        this.currentWorldRow = constant.worldStartRow;
+        this.currentWorldCol = constant.worldStartCol;
+        this.momentum = null;
+        this.ballPiece = undefined;
+        this.spawnPiece = undefined;
+        for (let i = 0; i < this.constant.pieces.length; i++) {
+            const piece = this.constant.pieces[i];
+            if (piece.typ === "spawn" &&
+                piece.worldRow == this.constant.worldStartRow &&
+                piece.worldCol == this.constant.worldStartCol) {
+                const ballPiece = {
+                    typ: "ball",
+                    row: piece.row,
+                    col: piece.col,
+                }
+                this.ballPiece = ballPiece;
+                this.spawnPiece = piece;
+            }
+        }
+    }
+
+    forEachPiece(callback) {
+        for (let row = 0; row < this.constant.numRows; row++) {
+            for (let col = 0; col < this.constant.numCols; col++) {
+                const piece = this.constant.matrix[row][col];
+                if (piece) {
+                    callback(piece);
+                }
+            }
+        }
+    }
+
+    respawn() {
+        this.ballPiece.row = this.spawnPiece.row;
+        this.ballPiece.col = this.spawnPiece.col;
+    }
+
+    moveBall(deltaRow, deltaCol) {
+        const beforePiece = this.constant.matrix[this.ballPiece.row][this.ballPiece.col];
+
+        if (beforePiece && beforePiece.typ === "trap") {
+            this.momentum = null;
+            return { trapped: beforePiece };
+        }
+
+        if (beforePiece && beforePiece.typ === "spawn" && this.momentum) {
+            this.momentum = null;
+            return null;
+        }
+
+        const newRow = this.ballPiece.row + deltaRow;
+        const newCol = this.ballPiece.col + deltaCol;
+
+        if (newRow < 0 || newRow >= this.constant.numRows || newCol < 0 || newCol >= this.constant.numCols) {
+            // TODO
+            return null;
+        }
+
+        const arrivedAtPiece = this.constant.matrix[newRow][newCol];
+
+        if (arrivedAtPiece != undefined && arrivedAtPiece.typ == "block") {
+            return null;
+        }
+
+        if (arrivedAtPiece != undefined && arrivedAtPiece.typ == "spawn") {
+            this.spawnPiece = arrivedAtPiece;
+        }
+
+        this.ballPiece.row = newRow;
+        this.ballPiece.col = newCol;
+        this.momentum = {
+            deltaRow: deltaRow,
+            deltaCol: deltaCol,
+        };
+
+        return {
+            deltaRow: deltaRow,
+            deltaCol: deltaCol,
+            newRow: newRow,
+            newCol: newCol,
+        };
+    }
+}
+
+class GameOld {
     constructor(world, worldNumRows, worldNumCols, worldStartRow, worldStartCol, stageNumRows, stageNumCols) {
         this.world = world;
         this.worldNumRows = worldNumRows;
@@ -580,29 +746,6 @@ class Game {
             const piece = this.pieces[i];
             this.addPiece(piece);
         }
-    }
-
-    clone() {
-        const game = new Game(
-            this.world,
-            this.worldNumRows,
-            this.worldNumCols,
-            this.worldStartRow,
-            this.worldStartCol,
-            this.stageNumRows,
-            this.stageNumCols);
-
-        game.ball = {
-            row: this.ball.row,
-            col: this.ball.col,
-        };
-
-        game.momentum = {
-            deltaRow: this.momentum.deltaRow,
-            deltaCol: this.momentum.deltaCol,
-        };
-
-        return game;
     }
 
     compileWorld(world) {
@@ -802,8 +945,8 @@ class Camera {
     }
 
     getCenterStageXy(wr, wc) {
-        const x = ((wc * (this.game.stageNumCols - 1)) + ((this.game.stageNumCols - 0) / 2)) * BLOCK_SIZE * this.scale;
-        const y = ((wr * (this.game.stageNumRows - 1)) + ((this.game.stageNumRows - 0) / 2)) * BLOCK_SIZE * this.scale;
+        const x = ((wc * (this.game.constant.stageNumCols - 1)) + ((this.game.constant.stageNumCols - 0) / 2)) * BLOCK_SIZE * this.scale;
+        const y = ((wr * (this.game.constant.stageNumRows - 1)) + ((this.game.constant.stageNumRows - 0) / 2)) * BLOCK_SIZE * this.scale;
         return {
             x: x,
             y: y
@@ -929,9 +1072,9 @@ class Viz {
 
         // Draw background color
         const g = new createjs.Shape();
-        g.graphics.beginFill("#eee").drawRect(0, 0, this.game.numCols * BLOCK_SIZE, this.game.numRows * BLOCK_SIZE);
+        g.graphics.beginFill("#eee").drawRect(0, 0, this.game.constant.numCols * BLOCK_SIZE, this.game.constant.numRows * BLOCK_SIZE);
         this.container.addChild(g);
-        g.cache(0, 0, this.game.numCols * BLOCK_SIZE, this.game.numRows * BLOCK_SIZE);
+        g.cache(0, 0, this.game.constant.numCols * BLOCK_SIZE, this.game.constant.numRows * BLOCK_SIZE);
 
         this.drawGrid();
 
@@ -971,8 +1114,8 @@ class Viz {
 
         if (this.solver) {
             console.log("solver")
-            for (let r = 0; r < this.solver.game.numRows; r++) {
-                for (let c = 0; c < this.solver.game.numCols; c++) {
+            for (let r = 0; r < this.solver.game.constant.numRows; r++) {
+                for (let c = 0; c < this.solver.game.constant.numCols; c++) {
                         console.log("PIEIKEKD")
                     if (this.solver.matrix[r][c].restingPoint) {
                         const p = {
@@ -990,8 +1133,8 @@ class Viz {
         this.ballAnimation = null;
         const z = this.queueResult["ball"];
         this.ballAnimation = new createjs.Sprite(z.sheet);
-        this.ballAnimation.x = this.game.ball.col * BLOCK_SIZE;
-        this.ballAnimation.y = this.game.ball.row * BLOCK_SIZE;
+        this.ballAnimation.x = this.game.ballPiece.col * BLOCK_SIZE;
+        this.ballAnimation.y = this.game.ballPiece.row * BLOCK_SIZE;
         z.init(this.ballAnimation);
         this.container.addChild(this.ballAnimation);
 
@@ -1003,8 +1146,8 @@ class Viz {
         });
 
         //for (let i = 0; i < this.game.pieces.length; i++) {
-        for (let r = 0; r < this.game.matrix.length; r++) {
-        for (let c = 0; c < this.game.matrix[r].length; c++) {
+        for (let r = 0; r < this.game.constant.matrix.length; r++) {
+        for (let c = 0; c < this.game.constant.matrix[r].length; c++) {
             /*const cell = this.game.matrix[r][c];
             if (!cell) {
                 continue;
@@ -1237,28 +1380,28 @@ class Viz {
     drawGrid() {
         const line = new createjs.Shape();
 
-        for (let r = 0; r <= this.game.numRows; r++) {
+        for (let r = 0; r <= this.game.constant.numRows; r++) {
             this.drawHorzGridLine(r, line);
         }
-        for (let c = 0; c <= this.game.numCols; c++) {
+        for (let c = 0; c <= this.game.constant.numCols; c++) {
             this.drawVertGridLine(c, line);
         }
 
         this.container.addChild(line);
-        line.cache(0, 0, this.game.numCols * BLOCK_SIZE, this.game.numRows * BLOCK_SIZE)
+        line.cache(0, 0, this.game.constant.numCols * BLOCK_SIZE, this.game.constant.numRows * BLOCK_SIZE)
     }
 
     drawHorzGridLine(rowIndex, line) {
         line.graphics.setStrokeStyle(0.5).beginStroke("#99f");
         line.graphics.moveTo(0, rowIndex * BLOCK_SIZE);
-        line.graphics.lineTo(this.game.numCols * BLOCK_SIZE, rowIndex * BLOCK_SIZE);
+        line.graphics.lineTo(this.game.constant.numCols * BLOCK_SIZE, rowIndex * BLOCK_SIZE);
         line.graphics.endStroke();
     }
 
     drawVertGridLine(colIndex, line) {
         line.graphics.setStrokeStyle(0.5).beginStroke("#99f");
         line.graphics.moveTo(colIndex * BLOCK_SIZE, 0);
-        line.graphics.lineTo(colIndex * BLOCK_SIZE, this.game.numRows * BLOCK_SIZE);
+        line.graphics.lineTo(colIndex * BLOCK_SIZE, this.game.constant.numRows * BLOCK_SIZE);
         line.graphics.endStroke();
     }
 
@@ -1583,7 +1726,7 @@ class Controller {
         const movement = this.game.moveBall(deltaRow, deltaCol);
         if (movement && movement.trapped) {
             const THIS = this;
-            console.log("trapped", movement, this.game.ball)
+            console.log("trapped", movement, this.game.ballPiece)
 
             this.viz.drawTrapShut(movement, function(){
                 console.log(2);
@@ -1597,10 +1740,10 @@ class Controller {
 
             //console.log("move", movement, this.game.ball, this.game.matrix[this.game.ball.row][this.game.ball.col])
             // if on level boundary
-            if ((this.game.ball.row % (this.game.stageNumRows - 1) == 0 || 
-                this.game.ball.col % (this.game.stageNumCols - 1) == 0) &&
-                (this.game.matrix[this.game.ball.row][this.game.ball.col] === undefined || 
-                 this.game.matrix[this.game.ball.row][this.game.ball.col].typ != "trap")) {
+            if ((this.game.ballPiece.row % (this.game.constant.stageNumRows - 1) == 0 || 
+                this.game.ballPiece.col % (this.game.constant.stageNumCols - 1) == 0) &&
+                (this.game.constant.matrix[this.game.ballPiece.row][this.game.ballPiece.col] === undefined || 
+                 this.game.constant.matrix[this.game.ballPiece.row][this.game.ballPiece.col].typ != "trap")) {
                 this.launchStageTeeen(deltaRow, deltaCol);
             }
 
@@ -1661,7 +1804,7 @@ function initRbWorld() {
             //GEN = new LevelGenerator(WORLD, WORLD_ROWS, WORLD_COLS, GEN_STAGE_ROW, GEN_STAGE_COL, GAME_NUM_ROWS, GAME_NUM_COLS);
             //WORLD = GEN.getWorld();
             GEN = new LevelGenerator(WORLD, WORLD_ROWS, WORLD_COLS, WORLD_START_ROW, WORLD_START_COL, GAME_NUM_ROWS, GAME_NUM_COLS);
-            GAME = new Game(WORLD, WORLD_ROWS, WORLD_COLS, WORLD_START_ROW, WORLD_START_COL, GAME_NUM_ROWS, GAME_NUM_COLS);
+            GAME = Game.build(WORLD, WORLD_ROWS, WORLD_COLS, WORLD_START_ROW, WORLD_START_COL, GAME_NUM_ROWS, GAME_NUM_COLS);
             SOLVER = new Solver(GAME);
             SOLVER.solve();
             VIZ = new Viz(queue, GAME, "rb-world-canvas", START_SCALE, MODE, SOLVER);
