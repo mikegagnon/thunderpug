@@ -582,6 +582,29 @@ class Game {
         }
     }
 
+    clone() {
+        const game = new Game(
+            this.world,
+            this.worldNumRows,
+            this.worldNumCols,
+            this.worldStartRow,
+            this.worldStartCol,
+            this.stageNumRows,
+            this.stageNumCols);
+
+        game.ball = {
+            row: this.ball.row,
+            col: this.ball.col,
+        };
+
+        game.momentum = {
+            deltaRow: this.momentum.deltaRow,
+            deltaCol: this.momentum.deltaCol,
+        };
+
+        return game;
+    }
+
     compileWorld(world) {
         this.worldMatrix = new Array(this.worldNumRows);
         for (let r = 0; r < this.worldNumRows; r++) {
