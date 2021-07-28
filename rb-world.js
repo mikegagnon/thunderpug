@@ -340,6 +340,11 @@ class Solver {
         }
     }
 
+    score() {
+        this.solve();
+        
+    }
+
     solve(gameClone) {
         if (!gameClone) {
             gameClone = this.game.clone();
