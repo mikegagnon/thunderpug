@@ -333,7 +333,17 @@ class Solver {
         for (let row = 0; row < this.game.constant.numRows; row++) {
             this.matrix[row] = new Array(this.game.constant.numCols);
             for (let col = 0; col < this.game.constant.numCols; col++) {
+
+                // this.matrix[r][c].comesInFrom[dr][dc] == true iff the ball arrived at rc
                 this.matrix[row][col] = {
+                    /*comesInFrom: [
+                        [false, false],
+                        [false, false],
+                    ],
+                    exitsTo: [
+                        [false, false],
+                        [false, false],
+                    ],*/
                     restingPoint: false,
                 }
             }
@@ -342,7 +352,10 @@ class Solver {
 
     score() {
         this.solve();
-        
+
+        //for (let r = 0; r < this.game.constant.numRows; r++) {
+        //    for (let c = 0; c < this.game.constant.numCols;)
+        //}
     }
 
     solve(gameClone) {
@@ -782,11 +795,11 @@ class Viz {
                         console.log("PIEIKEKD")
                     if (this.solver.matrix[r][c].restingPoint) {
                         const p = {
-                            typ: "token",
+                            typ: "restingPoint",
                             row: r,
                             col: c
                         };
-                        drawSprite(p, "token");
+                        drawSprite(p, "restingPoint");
                     }
                 }
             }
@@ -867,6 +880,24 @@ class Viz {
 
     setupSprites() {
         this.queueResult = {};
+
+        const restingPointSheetData = {
+            images: [this.queue.getResult("restingPoint")],
+            frames: {width:16, height:16},
+            animations: {
+                still:0,
+            }
+        };
+        const restingPointSpriteSheet = new createjs.SpriteSheet(restingPointSheetData);
+        //const trapAnimation = new createjs.Sprite(trapSpriteSheet);
+        //this.queueResult["trap"] = trapAnimation;
+        this.queueResult["restingPoint"] = {
+            sheet: restingPointSpriteSheet,
+            init: function(animation) {
+                //animation.gotoAndPlay("shut");
+                animation.gotoAndStop(0);
+            },
+        };
 
         const spawnSheetData = {
             images: [this.queue.getResult("spawn")],
@@ -1455,6 +1486,7 @@ function initRbWorld() {
         {id: "trap-floor", src:"trap-floor.png"},
         {id: "trap-ceil", src:"trap-ceil.png"},
         {id: "token", src:"token-sprite.png"},
+        {id: "restingPoint", src:"resting-point.png"},
 
     ]);
     function handleComplete() {
