@@ -334,16 +334,21 @@ class Solver {
             this.matrix[row] = new Array(this.game.constant.numCols);
             for (let col = 0; col < this.game.constant.numCols; col++) {
 
-                // this.matrix[r][c].comesInFrom[dr][dc] == true iff the ball arrived at rc
+                // this.matrix[r][c].comingIn[direction] == true iff the ball entered r,c from direction
+                // this.matrix[r][c].goingOut[direction] == true iff the ball exited r,c in direction
                 this.matrix[row][col] = {
-                    /*comesInFrom: [
-                        [false, false],
-                        [false, false],
-                    ],
-                    exitsTo: [
-                        [false, false],
-                        [false, false],
-                    ],*/
+                    comingIn: {
+                        left: false,
+                        right: false,
+                        top: false,
+                        bottom: false,
+                    },
+                    goingOut: {
+                        left: false,
+                        right: false,
+                        top: false,
+                        bottom: false,
+                    },
                     restingPoint: false,
                 }
             }
@@ -384,11 +389,46 @@ class Solver {
         this.solveDir(gameClone, 0, 1);
     }
 
+    getDirAndOpposite(deltaRow, deltaCol) {
+        if (deltaRow == -1 && deltaCol == 0) {
+            return {
+                direction: "top",
+                opposite: "bottom",
+            }
+        } else if (deltaRow == 1 && deltaCol == 0) {
+            return {
+                direction: "bottom",
+                opposite: "top",
+            }
+        } else if (deltaRow == 0 && deltaCol == -1) {
+            return {
+                direction: "left",
+                opposite: "right",
+            }
+        } else if (deltaRow == 0 && deltaCol == 1) {
+            return {
+                direction: "right",
+                opposite: "left",
+            }
+        } else {
+            throw new Error("bad");
+        }
+    }
+
     solveDir(gameClone, deltaRow, deltaCol) {
         gameClone = gameClone.clone();
 
         do {
+            const prevRow = gameClone.ballPiece.row;
+            const prevCol = gameClone.ballPiece.col;
             gameClone.moveBall(deltaRow, deltaCol)
+            if (gameClone.momentum) {
+                const curRow = gameClone.ballPiece.row;
+                const curCol = gameClone.ballPiece.col;
+                const d = this.getDirAndOpposite(deltaRow, deltaCol);
+                this.matrix[prevRow][prevCol].goingOut[d.direction] = true;
+                this.matrix[curRow][curCol].comingIn[d.opposite] = true;
+            }
         } while (gameClone.momentum != null);
         
         if (!this.matrix[gameClone.ballPiece.row][gameClone.ballPiece.col].restingPoint) {
