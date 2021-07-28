@@ -323,7 +323,64 @@ for (let i = 0; i < NUM_BLOCKS; i++) {
 
 }*/
 
+
+
 class Solver {
+    constructor(game) {
+        this.game = game;
+
+        this.matrix = new Array(this.game.constant.numRows);
+        for (let row = 0; row < this.game.constant.numRows; row++) {
+            this.matrix[row] = new Array(this.game.constant.numCols);
+            for (let col = 0; col < this.game.constant.numCols; col++) {
+                this.matrix[row][col] = {
+                    restingPoint: false,
+                }
+            }
+        }
+    }
+
+    solve(gameClone) {
+        if (!gameClone) {
+            gameClone = this.game.clone();
+        }
+        this.solveUp(gameClone);
+        this.solveDown(gameClone);
+        this.solveLeft(gameClone);
+        this.solveRight(gameClone);
+    }
+
+    solveUp(gameClone) {
+        this.solveDir(gameClone, -1, 0);
+    }
+
+    solveDown(gameClone) {
+        this.solveDir(gameClone, 1, 0);
+    }
+
+    solveLeft(gameClone) {
+        this.solveDir(gameClone, 0, -1);
+    }
+
+    solveRight(gameClone) {
+        this.solveDir(gameClone, 0, 1);
+    }
+
+    solveDir(gameClone, deltaRow, deltaCol) {
+        gameClone = gameClone.clone();
+
+        do {
+            gameClone.moveBall(deltaRow, deltaCol)
+        } while (gameClone.momentum != null);
+        
+        if (!this.matrix[gameClone.ballPiece.row][gameClone.ballPiece.col].restingPoint) {
+            this.matrix[gameClone.ballPiece.row][gameClone.ballPiece.col].restingPoint = true;
+            this.solve(gameClone);
+        }
+    }
+}
+
+class SolverOld {
     constructor(game) {
         this.game = game;
         this.matrix = new Array(this.game.constant.numRows);
@@ -341,38 +398,46 @@ class Solver {
         }
     }
 
-
-
-    solve(row, col) {
-        if (row == undefined) {
-            row = this.game.ballPiece.row;
-            col = this.game.ballPiece.col;
+    solve(gameClone) {
+        if (!gameClone) {
+            gameClone = this.game.clone();
         }
-        console.log("solve", row, col)
-
-        this.solveUp(row, col);
-        this.solveDown(row, col);
-        this.solveLeft(row, col);
-        this.solveRight(row, col);
+        this.solveUp();
+        //this.solveDown();
+        //this.solveLeft();
+        //this.solveRight();
     }
 
     solveUp(r, c) {
-        this.solveDir(r, c, -1, 0);
+        this.solveDir(-1, 0);
     }
 
     solveDown(r, c) {
-        this.solveDir(r, c, 1, 0);
+        this.solveDir(1, 0);
     }
 
     solveLeft(r, c) {
-        this.solveDir(r, c, 0, -1);
+        this.solveDir(0, -1);
     }
 
     solveRight(r, c) {
-        this.solveDir(r, c, 0, 1);
+        this.solveDir(0, 1);
     }
 
-    solveDir(r, c, deltaRow, deltaCol) {
+    solveDir(deltaRow, deltaCol) {
+        const gameClone = this.game.clone();
+
+        do {
+            gameClone.moveBall(deltaRow, deltaCol)
+        } while (gameClone.momentum != null);
+
+        if (!this.matrix[gameClone.ballPiece.row][gameClone.ballPiece.col].restingPoint) {
+            this.matrix[gameClone.ballPiece.row][gameClone.ballPiece.col].restingPoint = true;
+            this.solve(gameClone);
+        }
+
+        //if ()
+
         //console.log("asdfasdfsdf")
         
 
@@ -507,6 +572,20 @@ class Game {
         }
     }
 
+    clone() {
+        const game = new Game(this.constant);
+        game.currentWorldRow = this.currentWorldRow;
+        game.currentWorldCol = this.currentWorldCol;
+        game.momentum = this.momentum;
+        game.ballPiece = {
+            typ: this.ballPiece.typ,
+            row: this.ballPiece.row,
+            col: this.ballPiece.col,
+        };
+        game.spawnPiece = this.spawnPiece;
+        return game;
+    }
+
     forEachPiece(callback) {
         for (let row = 0; row < this.constant.numRows; row++) {
             for (let col = 0; col < this.constant.numCols; col++) {
@@ -525,14 +604,13 @@ class Game {
 
     moveBall(deltaRow, deltaCol) {
         const beforePiece = this.constant.matrix[this.ballPiece.row][this.ballPiece.col];
+        this.momentum = null;
 
         if (beforePiece && beforePiece.typ === "trap") {
-            this.momentum = null;
             return { trapped: beforePiece };
         }
 
         if (beforePiece && beforePiece.typ === "spawn" && this.momentum) {
-            this.momentum = null;
             return null;
         }
 
