@@ -857,13 +857,15 @@ class Viz {
                 const destX = startX + dx;
                 const destY = startY + dy;
                 line.graphics.lineTo(destX, destY);
+
+                //console.log(r, c);
+                //console.log(startX, startY, destX, destY);
                 //line.graphics.lineTo(this.game.constant.numCols * BLOCK_SIZE, rowIndex * BLOCK_SIZE);
-                line.graphics.endStroke();
+//                line.graphics.endStroke();
             }
 
             for (let r = 0; r < this.solver.game.constant.numRows; r++) {
                 for (let c = 0; c < this.solver.game.constant.numCols; c++) {
-                        console.log("PIEIKEKD")
                     if (this.solver.matrix[r][c].restingPoint) {
                         const p = {
                             typ: "restingPoint",
@@ -887,11 +889,12 @@ class Viz {
                         drawSolutionLine(r, c, "left");
                     }
                     if (this.solver.matrix[r][c].comingIn.right || this.solver.matrix[r][c].goingOut.right) {
-                        drawSolutionLine(r, c, "left");
+                        drawSolutionLine(r, c, "right");
                     }
                 }
             }
 
+            line.graphics.endStroke();
             this.container.addChild(line);
             line.cache(0, 0, this.game.constant.numCols * BLOCK_SIZE, this.game.constant.numRows * BLOCK_SIZE)
 
